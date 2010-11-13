@@ -78,18 +78,30 @@
 -- Define Danbooru tables.
 Danbooru = {API = {}, Posts = {}, Icons = {}, Settings = {}, Blacklisted = {}, Downloads = {URLs = {}, Index = {}}};
 
--- When commited, this will be the new revision.
-Danbooru.Revision = 18;
-
--- Latest binary URL and Update URL that gives us the latest revision number.
-Danbooru.ExecutableURL = "http://projects.shadiku.com/dl.php?repname=danbooru-desktop&amp;path=%2Fdanbooru.exe";
-Danbooru.UpdateURL = "http://projects.shadiku.com/update/danbooru.php";
-
 -- Version string, shown in the window title.
-Danbooru.VersionString = "Danbooru SVN - Revision "..Danbooru.Revision;
+Danbooru.VersionString = "Danbooru";
 
 -- The user-agent to use when downloading posts.
 Danbooru.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11";
+
+-- The path to the 15 frames which will be used for the splash. (~reag, r19)
+Danbooru.SplashImagePath = {};
+
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_15.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_14.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_13.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_12.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_11.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_10.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_9.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_8.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_7.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_6.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_5.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_4.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_3.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_2.png");
+table.insert(Danbooru.SplashImagePath, _SourceFolder.."\\AutoPlay\\Images\\splash\\2w88_1.png");
 
 -- Default thumbnail width and height. (larger takes longer to generate)
 Danbooru.ThumbnailWidth = 200;
@@ -189,14 +201,7 @@ end
 
 -- Default library path is the relative folder.
 Danbooru.LibraryPath = _SourceFolder;
-
--- Copy loading image to temporary file. (workaround)
-if not (File.DoesExist(_TempFolder.."\\~danbooru\\loading.png")) then
-	File.Copy("AutoPlay\\Images\\loading.png", _TempFolder.."\\~danbooru\\loading.png", false, true, false, false);
-end
-
--- Create danbooru temporary folder
-Folder.Create(_TempFolder.."\\~danbooru");
+Danbooru.SplashShown = false;
 
 -- Include my support function dynamic link library.
 Application.LoadActionPlugin("AutoPlay\\Docs\\libessentials-5.1.dll");
@@ -1152,8 +1157,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>297</DesignCodeLine>
-<DesignCodeCol>3</DesignCodeCol>
+<DesignCodeLine>13</DesignCodeLine>
+<DesignCodeCol>116</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -1214,7 +1219,7 @@ end</Script>
 <Args/>
 <Script>local Resolution = System.GetDisplayInfo();
 
-if (Resolution.Width &lt; 700) or (Resolution.Height &lt; 300) then
+if (Resolution.Width &lt; 700) or (Resolution.Height &lt; 350) then
 	Dialog.Message("Danbooru", "Your screen resolution must be set to 700x300 or higher.", 0, 16, 0);
 	Window.Close(Application.GetWndHandle(), 1);
 end
@@ -1322,15 +1327,8 @@ if (e_ID == 9) then
 	if (__DOWNLOAD) then
 		Dialog.Message("Danbooru", "Please wait for your download to complete first.", 0, 48, 0);
 	else
-		if (DialogEx.Show("Settings") == 0) then
-			Danbooru.EmptyListIcon();
-		end
+		DialogEx.Show("Settings");
 	end
-end
-
--- Menu handler for item "&amp;Check for updates.."
-if (e_ID == 15) then
-	DialogEx.Show("Updater");
 end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -1355,7 +1353,7 @@ end</Script>
 <ProductVer3>0</ProductVer3>
 <ProductVer4>0</ProductVer4>
 <Comments>Created with AutoPlay Media Studio</Comments>
-<Company>Original work by Shadiku Izayoi</Company>
+<Company>Original work by Shadiku Izayoi. &lt;www.shadiku.com&gt;</Company>
 <FileDescription>Danbooru desktop client</FileDescription>
 <LegalCopyright/>
 <LegalTrademarks/>
@@ -1500,14 +1498,6 @@ end</Script>
 <SubMenu/>
 <IconID>-1</IconID>
 </MenuItem>
-<MenuItem>
-<Text>&amp;Check for updates..</Text>
-<ID>15</ID>
-<Enabled>1</Enabled>
-<Checked>0</Checked>
-<SubMenu/>
-<IconID>-1</IconID>
-</MenuItem>
 </SubMenu>
 <IconID>-1</IconID>
 </MenuItem>
@@ -1581,6 +1571,12 @@ if (type(Danbooru.Settings.Selected) == "table") then
 	end
 end
 
+-- Set the page and limit from the settings file.
+if (tostring(Danbooru.Settings.RememberPageAndLimit) == "true") then
+	Input.SetText("Input2", tonumber(Danbooru.Settings.Page) or 1);
+	Input.SetText("Input3", tonumber(Danbooru.Settings.Limit) or 25);
+end
+
 -- Set the Window title.
 Window.SetText(Application.GetWndHandle(), Danbooru.VersionString);
 
@@ -1590,14 +1586,37 @@ Plugin.SetVisible("Plugin4", (System.GetOSName() == "Windows XP"));
 -- Empty the ListIcon.
 if (Danbooru.ListIcon) then
 	Danbooru.EmptyListIcon();
-end</Script>
+end
+
+-- Show splash screen. (~Reag)
+if (tostring(Danbooru.Settings.ShowSplashScreen) == "true") and (Danbooru.SplashShown == false) then
+	-- I don't like this.. (~shadiku)
+	local sImage = Danbooru.SplashImagePath[1];
+	
+	for i = 2, 15 do
+		sImage = sImage..", "..Danbooru.SplashImagePath[i];
+	end
+	
+	for i = 1, 35 do
+		sImage = sImage..", "..Danbooru.SplashImagePath[15];
+	end
+	
+	for i = 15, 1, -1 do
+		sImage = sImage..", "..Danbooru.SplashImagePath[i];
+	end
+	
+	DLL.CallFunction("AutoPlay\\Docs\\SplashImage.dll", "SplashImage", Application.GetWndHandle()..",\""..sImage.."\",2,25,1,0", DLL_RETURN_TYPE_LONG, DLL_CALL_STDCALL);
+end
+
+-- This is set here regardless. (~Reag)
+Danbooru.SplashShown = true;</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>56</DesignCodeLine>
-<DesignCodeCol>3</DesignCodeCol>
+<DesignCodeLine>84</DesignCodeLine>
+<DesignCodeCol>38</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1694,7 +1713,7 @@ function Danbooru.ListIcon.OnSelect(Row, Checked)
 	
 	-- Show an image in the preview object by loading HTML into it.
 	Web.LoadHTML("PreviewWeb1", [[&lt;html&gt;&lt;head&gt;&lt;style type="text/css"&gt;* { padding:0; margin:0;}
-	body {background: url(']].._TempFolder.."\\~danbooru\\loading.png"..[[') #000;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;img style="border: 1px #]]..HTMLColor..[[ solid;" src="]]..Danbooru.Posts[Row].Preview.URL..[[" width="98" height="98"&gt;&lt;/html&gt;]], false);
+	body {background: url(']].._SourceFolder.."\\AutoPlay\\Images\\loading.png"..[[') #000;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;img style="border: 1px #]]..HTMLColor..[[ solid;" src="]]..Danbooru.Posts[Row].Preview.URL..[[" width="98" height="98"&gt;&lt;/html&gt;]], false);
 	
 	-- Load post information into label objects.
 	Label.SetText("Label5", Table.Concat(Danbooru.Posts[Row].Tags or {}, " ", 1, -1));
@@ -1929,7 +1948,7 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>319</DesignCodeLine>
+<DesignCodeLine>239</DesignCodeLine>
 <DesignCodeCol>1</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
@@ -1939,16 +1958,21 @@ end</Script>
 <Args/>
 <Script>if (tostring(Danbooru.Settings.RememberSourceSelection) == "true") then
 	Danbooru.Settings.Selected = Danbooru.Sources;
-	
-	Danbooru.WriteSettingsFile();
-end</Script>
+end
+
+if (tostring(Danbooru.Settings.RememberPageAndLimit) == "true") then
+	Danbooru.Settings.Page = (tonumber(Input.GetText("Input2")) or 1);
+	Danbooru.Settings.Limit = (tonumber(Input.GetText("Input3")) or 25);	
+end
+
+Danbooru.WriteSettingsFile();</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>39</DesignCodeCol>
+<DesignCodeLine>4</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -5351,6 +5375,7 @@ if (t_tblChecked) then
 			-- Reset button to 'Download' state.
 			xButton.SetImage(this, "AutoPlay\\Images\\disk.png");
 			xButton.SetText(this, "Download");
+			xButton.SetVisible(this, false);
 			
 			-- Hide the download progress bar again.
 			Progress.SetVisible("Progress1", false);
@@ -5407,6 +5432,7 @@ if (t_tblChecked) then
 				-- Reset button to 'Download' state.
 				xButton.SetImage(this, "AutoPlay\\Images\\disk.png");
 				xButton.SetText(this, "Download");
+				xButton.SetVisible(this, false);
 				
 				-- Hide the download progress bar again.
 				Progress.SetVisible("Progress1", false);
@@ -5447,6 +5473,7 @@ if (t_tblChecked) then
 			-- Reset button to 'Download' state.
 			xButton.SetImage(this, "AutoPlay\\Images\\disk.png");
 			xButton.SetText(this, "Download");
+			xButton.SetVisible(this, false);
 			
 			-- Hide the download progress bar again.
 			Progress.SetVisible("Progress1", false);
@@ -5524,8 +5551,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>96</DesignCodeLine>
-<DesignCodeCol>22</DesignCodeCol>
+<DesignCodeLine>132</DesignCodeLine>
+<DesignCodeCol>26</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -14675,6 +14702,20 @@ end</Script>
 <Event>
 <Name>On Preload</Name>
 <Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Show</Name>
+<Args/>
 <Script>local Data = DialogValues.GetValue("Preview", "Data");
 
 if (Data) then	
@@ -14698,8 +14739,7 @@ if (Data) then
 			&lt;/div&gt;
 		&lt;/body&gt;
 	&lt;/html&gt;]];
-		TextFile.WriteFromString(_TempFolder.."\\~danbooru\\preview.html", HTMLCode, false);
-		Web.LoadURL("Web1", _TempFolder.."\\~danbooru\\preview.html");
+		Web.LoadHTML("Web1", HTMLCode);
 	else
 		local Width, Height = Data.Preview.Width, Data.Preview.Height;
 		
@@ -14737,8 +14777,7 @@ if (Data) then
 			&lt;/div&gt;
 		&lt;/body&gt;
 	&lt;/html&gt;]];
-		TextFile.WriteFromString(_TempFolder.."\\~danbooru\\preview.html", HTMLCode, false);
-		Web.LoadURL("Web1", _TempFolder.."\\~danbooru\\preview.html");
+		Web.LoadHTML("Web1", HTMLCode);
 	end
 end
 
@@ -14748,22 +14787,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>2</DesignCodeLine>
-<DesignCodeCol>14</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Show</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>65</DesignCodeLine>
+<DesignCodeCol>109</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -14930,7 +14955,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <VGuidelines/>
 </Page>
 </PageDialog>
-<PageDialog width="600" height="300" dialog_title="Danbooru" dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="480" min_height="200" fit_custom_mask_to_window="1" custom_mask="">
+<PageDialog width="600" height="260" dialog_title="About Danbooru.." dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="480" min_height="200" fit_custom_mask_to_window="1" custom_mask="">
 <Page>
 <Name>About</Name>
 <InheritObs/>
@@ -15076,1188 +15101,6 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 </BookMarks>
 </Event>
 <Object>
-<Type>40</Type>
-<Name>Plugin1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>53</Top>
-<Bottom>257</Bottom>
-<Left>-1</Left>
-<Right>601</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1046834529</DesignCodeLine>
-<DesignCodeCol>1073744397</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1728079726</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1080709120</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<PLUGIN>
-<DLLFile>Shape\Shape.apo</DLLFile>
-<CustomData>1,0,8355711,1,0,16777215,7,7</CustomData>
-</PLUGIN>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>40</Type>
-<Name>Plugin2</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>53</Top>
-<Bottom>257</Bottom>
-<Left>410</Left>
-<Right>601</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1046834529</DesignCodeLine>
-<DesignCodeCol>1073744397</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1728079726</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1080709120</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<PLUGIN>
-<DLLFile>Shape\Shape.apo</DLLFile>
-<CustomData>1,0,8355711,1,0,16053492,7,7</CustomData>
-</PLUGIN>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image9</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>105</Top>
-<Bottom>195</Bottom>
-<Left>45</Left>
-<Right>135</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7040620</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1802398766</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7495936</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7496050</DesignCodeLine>
-<DesignCodeCol>110</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\Shadiku.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>66</Top>
-<Bottom>87</Bottom>
-<Left>423</Left>
-<Right>484</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Thanks to:</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Segoe UI</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-12</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>66</Top>
-<Bottom>87</Bottom>
-<Left>423</Left>
-<Right>484</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>94</Top>
-<Bottom>110</Bottom>
-<Left>438</Left>
-<Right>454</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158016</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>15145</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1081706496</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\danbooru.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label2</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>95</Top>
-<Bottom>114</Bottom>
-<Left>459</Left>
-<Right>512</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Danbooru</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Microsoft Sans Serif</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>95</Top>
-<Bottom>114</Bottom>
-<Left>459</Left>
-<Right>512</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image2</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>121</Top>
-<Bottom>137</Bottom>
-<Left>438</Left>
-<Right>454</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158016</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>15145</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1081706496</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\konachan.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label7</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>122</Top>
-<Bottom>141</Bottom>
-<Left>459</Left>
-<Right>514</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Konachan</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Microsoft Sans Serif</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>122</Top>
-<Bottom>141</Bottom>
-<Left>459</Left>
-<Right>514</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image3</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>148</Top>
-<Bottom>164</Bottom>
-<Left>438</Left>
-<Right>454</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158016</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>15145</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1081706496</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\moe.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label8</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>149</Top>
-<Bottom>168</Bottom>
-<Left>459</Left>
-<Right>521</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Moe Imouto</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Microsoft Sans Serif</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>149</Top>
-<Bottom>168</Bottom>
-<Left>459</Left>
-<Right>521</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image4</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>175</Top>
-<Bottom>191</Bottom>
-<Left>438</Left>
-<Right>454</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158016</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>15145</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1081706496</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\sankaku.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label9</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>176</Top>
-<Bottom>195</Bottom>
-<Left>459</Left>
-<Right>550</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Sankaku Channel</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Microsoft Sans Serif</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>176</Top>
-<Bottom>195</Bottom>
-<Left>459</Left>
-<Right>550</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
 <Type>20</Type>
 <Name>xButton1</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
@@ -16272,8 +15115,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>267</Top>
-<Bottom>290</Bottom>
+<Top>227</Top>
+<Bottom>250</Bottom>
 <Left>515</Left>
 <Right>590</Right>
 </Coordinates>
@@ -16369,780 +15212,6 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSound/>
 </Options>
 <FontData>
-<FontName>Segoe UI</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-12</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image8</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>201</Top>
-<Bottom>217</Bottom>
-<Left>438</Left>
-<Right>454</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158016</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>15145</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1081706496</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\nekobooru.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label5</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>202</Top>
-<Bottom>221</Bottom>
-<Left>459</Left>
-<Right>518</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Nekobooru</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Microsoft Sans Serif</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>202</Top>
-<Bottom>221</Bottom>
-<Left>459</Left>
-<Right>518</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image7</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>90</Top>
-<Bottom>210</Bottom>
-<Left>30</Left>
-<Right>150</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>6778480</DesignCodeLine>
-<DesignCodeCol>2573</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781399655</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781417801</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781399666</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\avatar_frame.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image10</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>105</Top>
-<Bottom>195</Bottom>
-<Left>165</Left>
-<Right>255</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7040620</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1802398766</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7495936</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7496050</DesignCodeLine>
-<DesignCodeCol>110</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\Reag.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image11</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>90</Top>
-<Bottom>210</Bottom>
-<Left>150</Left>
-<Right>270</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>6778480</DesignCodeLine>
-<DesignCodeCol>2573</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781399655</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781417801</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781399666</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\avatar_frame.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image12</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>105</Top>
-<Bottom>195</Bottom>
-<Left>285</Left>
-<Right>375</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7040620</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1802398766</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7495936</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>7496050</DesignCodeLine>
-<DesignCodeCol>110</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\CrucioAtrus.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image13</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>90</Top>
-<Bottom>210</Bottom>
-<Left>270</Left>
-<Right>390</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>6778480</DesignCodeLine>
-<DesignCodeCol>2573</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781399655</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781417801</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1781399666</DesignCodeLine>
-<DesignCodeCol>26480</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\avatar_frame.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label3</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>205</Top>
-<Bottom>224</Bottom>
-<Left>51</Left>
-<Right>126</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Shadiku Izayoi</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
 <FontName>Tahoma</FontName>
 <CharacterSet>0</CharacterSet>
 <Height>-11</Height>
@@ -17152,244 +15221,6 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <StrikeOut>0</StrikeOut>
 <AntiAlias>1</AntiAlias>
 </FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>205</Top>
-<Bottom>224</Bottom>
-<Left>51</Left>
-<Right>126</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label10</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>205</Top>
-<Bottom>224</Bottom>
-<Left>170</Left>
-<Right>251</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Revack Reagen</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>205</Top>
-<Bottom>224</Bottom>
-<Left>170</Left>
-<Right>251</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label11</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>205</Top>
-<Bottom>224</Bottom>
-<Left>278</Left>
-<Right>387</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Imagine Programming</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>205</Top>
-<Bottom>224</Bottom>
-<Left>278</Left>
-<Right>387</Right>
-</OriginalRect>
-</Text>
 </Object>
 <Object>
 <Type>1</Type>
@@ -17406,10 +15237,10 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>16</Top>
-<Bottom>43</Bottom>
-<Left>20</Left>
-<Right>534</Right>
+<Top>15</Top>
+<Bottom>42</Bottom>
+<Left>40</Left>
+<Right>216</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -17473,10 +15304,10 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 </Event>
 <Actions/>
 <Text>
-<Body>The Danbooru desktop client was brought to you by the following people:</Body>
-<NormalColor>3355443</NormalColor>
-<HighlightColor>3355443</HighlightColor>
-<MouseDownColor>3355443</MouseDownColor>
+<Body>Danbooru desktop client</Body>
+<NormalColor>2147483647</NormalColor>
+<HighlightColor>2147483647</HighlightColor>
+<MouseDownColor>2147483647</MouseDownColor>
 <DisabledColor>12632256</DisabledColor>
 <FontData>
 <FontName>Segoe UI</FontName>
@@ -17496,328 +15327,10 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>16</Top>
-<Bottom>43</Bottom>
-<Left>20</Left>
-<Right>534</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label13</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>66</Top>
-<Bottom>87</Bottom>
-<Left>22</Left>
-<Right>81</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>The team:</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Segoe UI</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-12</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>66</Top>
-<Bottom>87</Bottom>
-<Left>22</Left>
-<Right>81</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>3</Type>
-<Name>Image6</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>227</Top>
-<Bottom>243</Bottom>
-<Left>438</Left>
-<Right>454</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158016</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>15145</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1081706496</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<NormalImage>
-<Filename>AutoPlay\Images\gelbooru.png</Filename>
-<UseTransColor>0</UseTransColor>
-<TransClr>16777215</TransClr>
-<TransTolerance>10</TransTolerance>
-<Opacity>100</Opacity>
-<HTMode>0</HTMode>
-</NormalImage>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label6</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>228</Top>
-<Bottom>247</Bottom>
-<Left>459</Left>
-<Right>508</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1684828006</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Gelbooru</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Microsoft Sans Serif</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>228</Top>
-<Bottom>247</Bottom>
-<Left>459</Left>
-<Right>508</Right>
+<Top>15</Top>
+<Bottom>42</Bottom>
+<Left>40</Left>
+<Right>216</Right>
 </OriginalRect>
 </Text>
 </Object>
@@ -17836,8 +15349,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>275</Top>
-<Bottom>290</Bottom>
+<Top>235</Top>
+<Bottom>250</Bottom>
 <Left>10</Left>
 <Right>90</Right>
 </Coordinates>
@@ -17915,6 +15428,1166 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 </Object>
+<Object>
+<Type>1</Type>
+<Name>Label1</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>39</Top>
+<Bottom>58</Bottom>
+<Left>20</Left>
+<Right>123</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>1073744397</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>2573</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Unknown revision.</Body>
+<NormalColor>8421504</NormalColor>
+<HighlightColor>8421504</HighlightColor>
+<MouseDownColor>8421504</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-11</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>39</Top>
+<Bottom>58</Bottom>
+<Left>20</Left>
+<Right>123</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>40</Type>
+<Name>Plugin1</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>70</Top>
+<Bottom>217</Bottom>
+<Left>-1</Left>
+<Right>601</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>4063242</DesignCodeLine>
+<DesignCodeCol>17747</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>5832750</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1684828006</DesignCodeLine>
+<DesignCodeCol>3043941</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>Shape\Shape.apo</DLLFile>
+<CustomData>1,0,8355711,1,0,16777215,7,7</CustomData>
+</PLUGIN>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label2</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>95</Top>
+<Bottom>118</Bottom>
+<Left>27</Left>
+<Right>90</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>The team:</Body>
+<NormalColor>3355443</NormalColor>
+<HighlightColor>3355443</HighlightColor>
+<MouseDownColor>3355443</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-13</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>95</Top>
+<Bottom>118</Bottom>
+<Left>27</Left>
+<Right>90</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label3</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>97</Top>
+<Bottom>118</Bottom>
+<Left>125</Left>
+<Right>206</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Shadiku Izayoi</Body>
+<NormalColor>8421504</NormalColor>
+<HighlightColor>8421504</HighlightColor>
+<MouseDownColor>8421504</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>97</Top>
+<Bottom>118</Bottom>
+<Left>125</Left>
+<Right>206</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label4</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>117</Top>
+<Bottom>138</Bottom>
+<Left>125</Left>
+<Right>210</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Revack Reagen</Body>
+<NormalColor>8421504</NormalColor>
+<HighlightColor>8421504</HighlightColor>
+<MouseDownColor>8421504</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>117</Top>
+<Bottom>138</Bottom>
+<Left>125</Left>
+<Right>210</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label5</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>137</Top>
+<Bottom>158</Bottom>
+<Left>125</Left>
+<Right>251</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Imagine Programming</Body>
+<NormalColor>8421504</NormalColor>
+<HighlightColor>8421504</HighlightColor>
+<MouseDownColor>8421504</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>137</Top>
+<Bottom>158</Bottom>
+<Left>125</Left>
+<Right>251</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label6</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>165</Top>
+<Bottom>188</Bottom>
+<Left>27</Left>
+<Right>118</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Special thanks:</Body>
+<NormalColor>3355443</NormalColor>
+<HighlightColor>3355443</HighlightColor>
+<MouseDownColor>3355443</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-13</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>165</Top>
+<Bottom>188</Bottom>
+<Left>27</Left>
+<Right>118</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label7</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>167</Top>
+<Bottom>188</Bottom>
+<Left>125</Left>
+<Right>198</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Robert Styler</Body>
+<NormalColor>8421504</NormalColor>
+<HighlightColor>8421504</HighlightColor>
+<MouseDownColor>8421504</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>167</Top>
+<Bottom>188</Bottom>
+<Left>125</Left>
+<Right>198</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>3</Type>
+<Name>Image1</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>129</Top>
+<Bottom>206</Bottom>
+<Left>390</Left>
+<Right>590</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<NormalImage>
+<Filename>AutoPlay\Images\logo.png</Filename>
+<UseTransColor>0</UseTransColor>
+<TransClr>16777215</TransClr>
+<TransTolerance>10</TransTolerance>
+<Opacity>100</Opacity>
+<HTMode>0</HTMode>
+</NormalImage>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
+<Object>
+<Type>3</Type>
+<Name>Image2</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>19</Top>
+<Bottom>35</Bottom>
+<Left>22</Left>
+<Right>38</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1802398720</DesignCodeLine>
+<DesignCodeCol>17664</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1802398766</DesignCodeLine>
+<DesignCodeCol>3043840</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1802398766</DesignCodeLine>
+<DesignCodeCol>7301376</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>7040620</DesignCodeLine>
+<DesignCodeCol>107</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<NormalImage>
+<Filename>AutoPlay\Images\danbooru.png</Filename>
+<UseTransColor>0</UseTransColor>
+<TransClr>16777215</TransClr>
+<TransTolerance>10</TransTolerance>
+<Opacity>100</Opacity>
+<HTMode>0</HTMode>
+</NormalImage>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label8</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>20</Top>
+<Bottom>41</Bottom>
+<Left>216</Left>
+<Right>392</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>1073744397</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>2573</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>(original work by shadiku izayoi)</Body>
+<NormalColor>10066329</NormalColor>
+<HighlightColor>10066329</HighlightColor>
+<MouseDownColor>10066329</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>20</Top>
+<Bottom>41</Bottom>
+<Left>216</Left>
+<Right>392</Right>
+</OriginalRect>
+</Text>
+</Object>
 <HGuidelines/>
 <VGuidelines/>
 </Page>
@@ -17940,6 +16613,20 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 </Background>
 <Event>
 <Name>On Preload</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Show</Name>
 <Args/>
 <Script>local Data = DialogValues.GetValue("Preview", "Data");
 
@@ -17990,8 +16677,7 @@ if (Data) then
 			&lt;/div&gt;
 		&lt;/body&gt;
 	&lt;/html&gt;]];
-		TextFile.WriteFromString(_TempFolder.."\\~danbooru\\preview.html", HTMLCode, false);
-		Web.LoadURL("Web1", _TempFolder.."\\~danbooru\\preview.html");
+		Web.LoadHTML("Web1", HTMLCode);
 	else
 		Dialog.Message("Danbooru", "This post appears to have no posts.", 0, 48, 0);
 		DialogEx.Close(0);
@@ -18002,22 +16688,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>54</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Show</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>54</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -18536,6 +17208,7 @@ else
 end
 
 Danbooru.SetSettingsValue("ClearListOnNewSearch", CheckBox.GetChecked("CheckBox4"));
+Danbooru.SetSettingsValue("ShowSplashScreen", CheckBox.GetChecked("CheckBox2"));
 
 Danbooru.SetSettingsValue("EnableNewColorRequest", RadioButton.GetChecked("RadioButton4"));
 Danbooru.SetSettingsValue("EnableNewStatusColor", RadioButton.GetChecked("RadioButton5"));
@@ -18550,8 +17223,8 @@ DialogEx.Close(0);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>30</DesignCodeLine>
-<DesignCodeCol>90</DesignCodeCol>
+<DesignCodeLine>28</DesignCodeLine>
+<DesignCodeCol>76</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -19112,8 +17785,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>129</Top>
-<Bottom>148</Bottom>
+<Top>122</Top>
+<Bottom>141</Bottom>
 <Left>32</Left>
 <Right>95</Right>
 </Coordinates>
@@ -19202,8 +17875,8 @@ DialogEx.Close(0);</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>129</Top>
-<Bottom>148</Bottom>
+<Top>122</Top>
+<Bottom>141</Bottom>
 <Left>32</Left>
 <Right>95</Right>
 </OriginalRect>
@@ -19224,8 +17897,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>129</Top>
-<Bottom>144</Bottom>
+<Top>122</Top>
+<Bottom>137</Bottom>
 <Left>134</Left>
 <Right>283</Right>
 </Coordinates>
@@ -19333,8 +18006,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>149</Top>
-<Bottom>164</Bottom>
+<Top>142</Top>
+<Bottom>157</Bottom>
 <Left>134</Left>
 <Right>334</Right>
 </Coordinates>
@@ -19442,8 +18115,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>169</Top>
-<Bottom>184</Bottom>
+<Top>162</Top>
+<Bottom>177</Bottom>
 <Left>134</Left>
 <Right>283</Right>
 </Coordinates>
@@ -19835,8 +18508,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>379</Top>
-<Bottom>393</Bottom>
+<Top>356</Top>
+<Bottom>370</Bottom>
 <Left>32</Left>
 <Right>354</Right>
 </Coordinates>
@@ -19944,8 +18617,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>356</Top>
-<Bottom>370</Bottom>
+<Top>333</Top>
+<Bottom>347</Bottom>
 <Left>32</Left>
 <Right>354</Right>
 </Coordinates>
@@ -20053,8 +18726,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>201</Top>
-<Bottom>220</Bottom>
+<Top>194</Top>
+<Bottom>213</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </Coordinates>
@@ -20143,8 +18816,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>201</Top>
-<Bottom>220</Bottom>
+<Top>194</Top>
+<Bottom>213</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </OriginalRect>
@@ -20165,8 +18838,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>198</Top>
-<Bottom>220</Bottom>
+<Top>191</Top>
+<Bottom>213</Bottom>
 <Left>133</Left>
 <Right>518</Right>
 </Coordinates>
@@ -20241,8 +18914,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>202</Top>
-<Bottom>217</Bottom>
+<Top>195</Top>
+<Bottom>210</Bottom>
 <Left>136</Left>
 <Right>515</Right>
 </Coordinates>
@@ -20323,8 +18996,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>305</Top>
-<Bottom>320</Bottom>
+<Top>282</Top>
+<Bottom>297</Bottom>
 <Left>32</Left>
 <Right>332</Right>
 </Coordinates>
@@ -20432,8 +19105,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>326</Top>
-<Bottom>341</Bottom>
+<Top>303</Top>
+<Bottom>318</Bottom>
 <Left>32</Left>
 <Right>332</Right>
 </Coordinates>
@@ -20525,6 +19198,115 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 </Settings>
+</Object>
+<Object>
+<Type>15</Type>
+<Name>CheckBox2</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>379</Top>
+<Bottom>393</Bottom>
+<Left>32</Left>
+<Right>354</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Options>
+<Text>Show the splash screen when the program loads.</Text>
+<NormalColor format="hex">000000</NormalColor>
+<HighlightColor format="hex">000000</HighlightColor>
+<MouseDownColor format="hex">000000</MouseDownColor>
+<Disabled format="hex">c0c0c0</Disabled>
+<Alignment>0</Alignment>
+<ButtonAlign>0</ButtonAlign>
+<RTLReadingOrder>0</RTLReadingOrder>
+<Checked>1</Checked>
+<MouseOverSoundMode>0</MouseOverSoundMode>
+<MouseOverSound/>
+<MouseClickSoundMode>0</MouseClickSoundMode>
+<MouseClickSound/>
+</Options>
+<Font>
+<FontData>
+<FontName>Tahoma</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-11</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+</Font>
 </Object>
 <HGuidelines/>
 <VGuidelines/>
@@ -25580,22 +24362,16 @@ DialogEx.Close(0);</Script>
 <Event>
 <Name>On Preload</Name>
 <Args/>
-<Script>-- CheckBox1, CheckBox2, CheckBox3, CheckBox4, CheckBox5, CheckBox6, CheckBox7, CheckBox8.
+<Script>-- CheckBox1, CheckBox2, CheckBox3, CheckBox4, CheckBox5, CheckBox6, CheckBox7, CheckBox8, CheckBox9.
 CheckBox.SetChecked("CheckBox1", (tostring(Danbooru.Settings.RememberSourceSelection) == "true"));
 CheckBox.SetChecked("CheckBox2", (tostring(Danbooru.Settings.UseGelbooruWorkaround) == "true"));
+CheckBox.SetChecked("CheckBox3", (tostring(Danbooru.Settings.ShowSplashScreen) == "true"));
 CheckBox.SetChecked("CheckBox4", (tostring(Danbooru.Settings.ClearListOnNewSearch) == "true"));
 CheckBox.SetChecked("CheckBox5", (tostring(Danbooru.Settings.InteractionPlaySound) == "true"));
 CheckBox.SetChecked("CheckBox6", (tostring(Danbooru.Settings.NoReplacePrompt) == "true"));
 CheckBox.SetChecked("CheckBox7", (tostring(Danbooru.Settings.NeverGetNotes) == "true"));
 CheckBox.SetChecked("CheckBox8", (tostring(Danbooru.Settings.RememberTags) == "true"));
-
--- CheckBox3.
-if (System.GetDisplayInfo().Width &lt; 950) then
-	CheckBox.SetChecked("CheckBox3", true);
-	CheckBox.SetEnabled("CheckBox3", false);
-else
-	CheckBox.SetEnabled("CheckBox3", true);
-end
+CheckBox.SetChecked("CheckBox9", (tostring(Danbooru.Settings.RememberPageAndLimit) == "true"));
 
 -- ComboBox1.
 local IsOverwrite = (tostring(Danbooru.Settings.NoReplaceType) == "overwrite");
@@ -25643,8 +24419,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>28</DesignCodeLine>
-<DesignCodeCol>46</DesignCodeCol>
+<DesignCodeLine>9</DesignCodeLine>
+<DesignCodeCol>81</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -25959,12 +24735,13 @@ end
 
 Danbooru.SetSettingsValue("RememberSourceSelection", CheckBox.GetChecked("CheckBox1"));
 Danbooru.SetSettingsValue("UseGelbooruWorkaround", CheckBox.GetChecked("CheckBox2"));
-Danbooru.SetSettingsValue("UseAlternativeDialog", CheckBox.GetChecked("CheckBox3"));
+Danbooru.SetSettingsValue("ShowSplashScreen", CheckBox.GetChecked("CheckBox3"));
 Danbooru.SetSettingsValue("ClearListOnNewSearch", CheckBox.GetChecked("CheckBox4"));
 Danbooru.SetSettingsValue("InteractionPlaySound", CheckBox.GetChecked("CheckBox5"));
 Danbooru.SetSettingsValue("NoReplacePrompt", CheckBox.GetChecked("CheckBox6"));
 Danbooru.SetSettingsValue("NeverGetNotes", CheckBox.GetChecked("CheckBox7"));
 Danbooru.SetSettingsValue("RememberTags", CheckBox.GetChecked("CheckBox8"));
+Danbooru.SetSettingsValue("RememberPageAndLimit", CheckBox.GetChecked("CheckBox9"));
 
 Danbooru.SetSettingsValue("EnableNewColorRequest", RadioButton.GetChecked("RadioButton4"));
 Danbooru.SetSettingsValue("EnableNewStatusColor", RadioButton.GetChecked("RadioButton5"));
@@ -25985,8 +24762,8 @@ DialogEx.Close(0);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>25</DesignCodeLine>
-<DesignCodeCol>39</DesignCodeCol>
+<DesignCodeLine>26</DesignCodeLine>
+<DesignCodeCol>27</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -27095,8 +25872,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>171</Top>
-<Bottom>185</Bottom>
+<Top>194</Top>
+<Bottom>208</Bottom>
 <Left>125</Left>
 <Right>447</Right>
 </Coordinates>
@@ -27208,8 +25985,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>246</Top>
-<Bottom>260</Bottom>
+<Top>269</Top>
+<Bottom>283</Bottom>
 <Left>125</Left>
 <Right>447</Right>
 </Coordinates>
@@ -27317,8 +26094,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>245</Top>
-<Bottom>264</Bottom>
+<Top>268</Top>
+<Bottom>287</Bottom>
 <Left>32</Left>
 <Right>110</Right>
 </Coordinates>
@@ -27407,8 +26184,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>245</Top>
-<Bottom>264</Bottom>
+<Top>268</Top>
+<Bottom>287</Bottom>
 <Left>32</Left>
 <Right>110</Right>
 </OriginalRect>
@@ -27429,8 +26206,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>268</Top>
-<Bottom>284</Bottom>
+<Top>291</Top>
+<Bottom>307</Bottom>
 <Left>125</Left>
 <Right>475</Right>
 </Coordinates>
@@ -27538,8 +26315,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>370</Top>
-<Bottom>389</Bottom>
+<Top>413</Top>
+<Bottom>432</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </Coordinates>
@@ -27628,8 +26405,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>370</Top>
-<Bottom>389</Bottom>
+<Top>413</Top>
+<Bottom>432</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </OriginalRect>
@@ -27650,8 +26427,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>367</Top>
-<Bottom>389</Bottom>
+<Top>410</Top>
+<Bottom>432</Bottom>
 <Left>124</Left>
 <Right>509</Right>
 </Coordinates>
@@ -27726,8 +26503,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>371</Top>
-<Bottom>386</Bottom>
+<Top>414</Top>
+<Bottom>429</Bottom>
 <Left>127</Left>
 <Right>506</Right>
 </Coordinates>
@@ -27808,8 +26585,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>291</Top>
-<Bottom>307</Bottom>
+<Top>314</Top>
+<Bottom>330</Bottom>
 <Left>125</Left>
 <Right>281</Right>
 </Coordinates>
@@ -27917,8 +26694,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>286</Top>
-<Bottom>307</Bottom>
+<Top>309</Top>
+<Bottom>330</Bottom>
 <Left>353</Left>
 <Right>499</Right>
 </Coordinates>
@@ -28029,8 +26806,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>286</Top>
-<Bottom>307</Bottom>
+<Top>309</Top>
+<Bottom>330</Bottom>
 <Left>282</Left>
 <Right>352</Right>
 </Coordinates>
@@ -28127,8 +26904,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>319</Top>
-<Bottom>334</Bottom>
+<Top>362</Top>
+<Bottom>377</Bottom>
 <Left>126</Left>
 <Right>426</Right>
 </Coordinates>
@@ -28236,8 +27013,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>340</Top>
-<Bottom>355</Bottom>
+<Top>383</Top>
+<Bottom>398</Bottom>
 <Left>126</Left>
 <Right>426</Right>
 </Coordinates>
@@ -28345,8 +27122,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>319</Top>
-<Bottom>338</Bottom>
+<Top>362</Top>
+<Bottom>381</Bottom>
 <Left>32</Left>
 <Right>94</Right>
 </Coordinates>
@@ -28435,8 +27212,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>319</Top>
-<Bottom>338</Bottom>
+<Top>362</Top>
+<Bottom>381</Bottom>
 <Left>32</Left>
 <Right>94</Right>
 </OriginalRect>
@@ -28457,8 +27234,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>193</Top>
-<Bottom>209</Bottom>
+<Top>216</Top>
+<Bottom>232</Bottom>
 <Left>125</Left>
 <Right>475</Right>
 </Coordinates>
@@ -28566,8 +27343,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>216</Top>
-<Bottom>232</Bottom>
+<Top>239</Top>
+<Bottom>255</Bottom>
 <Left>125</Left>
 <Right>475</Right>
 </Coordinates>
@@ -28660,175 +27437,9 @@ end</Script>
 </FontData>
 </Font>
 </Object>
-<HGuidelines/>
-<VGuidelines/>
-</Page>
-</PageDialog>
-<PageDialog width="400" height="150" dialog_title="Danbooru" dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="400" min_height="150" fit_custom_mask_to_window="1" custom_mask="">
-<Page>
-<Name>Updater</Name>
-<InheritObs/>
-<InheritBG/>
-<Description/>
-<Keywords/>
-<Background>
-<Type>0</Type>
-<ImageStyle>0</ImageStyle>
-<TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
-<TransitionEffect/>
-<TransProps/>
-<NormalImage>
-<Filename/>
-</NormalImage>
-</Background>
-<Event>
-<Name>On Preload</Name>
-<Args/>
-<Script>xButton.SetEnabled("xButton1", true);
-xButton.SetEnabled("xButton2", true);
-
-Label.SetText("Label3", Danbooru.Revision);
-
-local Response = HTTP.Submit(Danbooru.UpdateURL, {}, 1, 10, 80, nil, nil);
-
-if (Application.GetLastError() ~= 0) then
-	Dialog.Message("Danbooru", "Failed to get latest revision.", 0, 48, 0);
-	DialogEx.Close(-1);
-else
-	if not (tonumber(Response)) then
-		Dialog.Message("Danbooru", "Failed to get latest revision.", 0, 48, 0);
-		DialogEx.Close(-1);
-	else
-		Label.SetText("Label5", Response);
-	end
-end</Script>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>9</DesignCodeLine>
-<DesignCodeCol>20</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Show</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Close</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Timer</Name>
-<Args>number e_ID</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Audio</Name>
-<Args>number e_Channel, string e_State</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Key</Name>
-<Args>number e_Key, table e_Modifiers</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Mouse Button</Name>
-<Args>number e_Type, number e_X, number e_Y</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Mouse Move</Name>
-<Args>number e_X, number e_Y</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Size</Name>
-<Args>number e_WindowWidth, number e_WindowHeight, number e_DialogWidth, number e_DialogHeight, number e_Type</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
 <Object>
-<Type>40</Type>
-<Name>Plugin1</Name>
+<Type>15</Type>
+<Name>CheckBox3</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
 <VisibleAtRunTime>1</VisibleAtRunTime>
 <Locked>0</Locked>
@@ -28839,12 +27450,12 @@ end</Script>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
 <TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
+<AutoResize>15</AutoResize>
 <Coordinates>
-<Top>0</Top>
-<Bottom>29</Bottom>
-<Left>0</Left>
-<Right>400</Right>
+<Top>337</Top>
+<Bottom>353</Bottom>
+<Left>125</Left>
+<Right>475</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -28854,733 +27465,13 @@ end</Script>
 <Name>On Click</Name>
 <Args/>
 <Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>4079394</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>1838</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<PLUGIN>
-<DLLFile>Shape\Shape.apo</DLLFile>
-<CustomData>1,0,2631720,1,0,2631720,7,7</CustomData>
-</PLUGIN>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>7</Top>
-<Bottom>26</Bottom>
-<Left>5</Left>
-<Right>121</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>3014766</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1784827648</DesignCodeLine>
-<DesignCodeCol>7627621</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1230241838</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Checking for updates..</Body>
-<NormalColor>16777215</NormalColor>
-<HighlightColor>16777215</HighlightColor>
-<MouseDownColor>16777215</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>7</Top>
-<Bottom>26</Bottom>
-<Left>5</Left>
-<Right>121</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label2</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>50</Top>
-<Bottom>69</Bottom>
-<Left>25</Left>
-<Right>125</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>3014766</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1784827648</DesignCodeLine>
-<DesignCodeCol>7627621</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1230241838</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Current revision:</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>700</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>50</Top>
-<Bottom>69</Bottom>
-<Left>25</Left>
-<Right>125</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label3</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>50</Top>
-<Bottom>69</Bottom>
-<Left>135</Left>
-<Right>153</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>3014766</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1784827648</DesignCodeLine>
-<DesignCodeCol>7627621</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1230241838</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>...</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>50</Top>
-<Bottom>69</Bottom>
-<Left>135</Left>
-<Right>153</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label4</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>74</Top>
-<Bottom>93</Bottom>
-<Left>25</Left>
-<Right>118</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>3014766</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1784827648</DesignCodeLine>
-<DesignCodeCol>7627621</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1230241838</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>Latest revision:</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>700</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>74</Top>
-<Bottom>93</Bottom>
-<Left>25</Left>
-<Right>118</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>1</Type>
-<Name>Label5</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>1</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>74</Top>
-<Bottom>93</Bottom>
-<Left>135</Left>
-<Right>153</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>3014766</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1784827648</DesignCodeLine>
-<DesignCodeCol>7627621</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>1230241838</DesignCodeLine>
-<DesignCodeCol>17747</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<Text>
-<Body>...</Body>
-<NormalColor>2147483647</NormalColor>
-<HighlightColor>2147483647</HighlightColor>
-<MouseDownColor>2147483647</MouseDownColor>
-<DisabledColor>12632256</DisabledColor>
-<FontData>
-<FontName>Tahoma</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-11</Height>
-<Weight>400</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<Orientation>0</Orientation>
-<AutoSize>1</AutoSize>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-<OriginalRect>
-<Top>74</Top>
-<Bottom>93</Bottom>
-<Left>135</Left>
-<Right>153</Right>
-</OriginalRect>
-</Text>
-</Object>
-<Object>
-<Type>40</Type>
-<Name>Plugin2</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>114</Top>
-<Bottom>151</Bottom>
-<Left>-2</Left>
-<Right>401</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>4079394</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>5857125</DesignCodeLine>
-<DesignCodeCol>3043941</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>1838</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<PLUGIN>
-<DLLFile>Shape\Shape.apo</DLLFile>
-<CustomData>1,0,8355711,1,0,16777215,7,7</CustomData>
-</PLUGIN>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>20</Type>
-<Name>xButton1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>0</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>121</Top>
-<Bottom>144</Bottom>
-<Left>234</Left>
-<Right>309</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script>-- disable buttons.
-xButton.SetEnabled("xButton1", false);
-xButton.SetEnabled("xButton2", false);
-
--- open exe path in browser.
-File.OpenURL(Danbooru.ExecutableURL);
-
--- terminate program entirely.
-Window.Close(Application.GetWndHandle(), 1);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>19</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -29615,20 +27506,6 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 <Event>
 <Name>On Leave</Name>
 <Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Hyperlink</Name>
-<Args>string e_Hyperlink</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -29642,23 +27519,23 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 </Event>
 <Actions/>
 <Options>
-<Text>Install</Text>
-<TextColor format="hex">000000</TextColor>
-<EnableMarkup>0</EnableMarkup>
-<ButtonImage/>
-<TextAlignment>2</TextAlignment>
-<ImageAlignment>0</ImageAlignment>
-<ImageTextRelation>3</ImageTextRelation>
-<Theme>0</Theme>
-<Style>0</Style>
-<State>0</State>
+<Text>Show the splash screen before the program loads.</Text>
+<NormalColor format="hex">000000</NormalColor>
+<HighlightColor format="hex">000000</HighlightColor>
+<MouseDownColor format="hex">000000</MouseDownColor>
+<Disabled format="hex">c0c0c0</Disabled>
+<Alignment>0</Alignment>
+<ButtonAlign>0</ButtonAlign>
+<RTLReadingOrder>0</RTLReadingOrder>
+<Checked>0</Checked>
 <MouseOverSoundMode>0</MouseOverSoundMode>
 <MouseOverSound/>
 <MouseClickSoundMode>0</MouseClickSoundMode>
 <MouseClickSound/>
 </Options>
+<Font>
 <FontData>
-<FontName>Microsoft Sans Serif</FontName>
+<FontName>Tahoma</FontName>
 <CharacterSet>0</CharacterSet>
 <Height>-11</Height>
 <Weight>400</Weight>
@@ -29667,10 +27544,11 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 <StrikeOut>0</StrikeOut>
 <AntiAlias>1</AntiAlias>
 </FontData>
+</Font>
 </Object>
 <Object>
-<Type>20</Type>
-<Name>xButton2</Name>
+<Type>15</Type>
+<Name>CheckBox9</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
 <VisibleAtRunTime>1</VisibleAtRunTime>
 <Locked>0</Locked>
@@ -29683,10 +27561,10 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>121</Top>
-<Bottom>144</Bottom>
-<Left>314</Left>
-<Right>389</Right>
+<Top>171</Top>
+<Bottom>185</Bottom>
+<Left>125</Left>
+<Right>485</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -29695,14 +27573,14 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>DialogEx.Close(0);</Script>
+<Script/>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>18</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -29748,39 +27626,25 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Event>
-<Name>On Hyperlink</Name>
-<Args>string e_Hyperlink</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
 <Actions/>
 <Options>
-<Text>Cancel</Text>
-<TextColor format="hex">000000</TextColor>
-<EnableMarkup>0</EnableMarkup>
-<ButtonImage/>
-<TextAlignment>2</TextAlignment>
-<ImageAlignment>0</ImageAlignment>
-<ImageTextRelation>3</ImageTextRelation>
-<Theme>0</Theme>
-<Style>0</Style>
-<State>0</State>
+<Text>Remember the current Page and Limit when closing the application.</Text>
+<NormalColor format="hex">000000</NormalColor>
+<HighlightColor format="hex">000000</HighlightColor>
+<MouseDownColor format="hex">000000</MouseDownColor>
+<Disabled format="hex">c0c0c0</Disabled>
+<Alignment>0</Alignment>
+<ButtonAlign>0</ButtonAlign>
+<RTLReadingOrder>0</RTLReadingOrder>
+<Checked>0</Checked>
 <MouseOverSoundMode>0</MouseOverSoundMode>
 <MouseOverSound/>
 <MouseClickSoundMode>0</MouseClickSoundMode>
 <MouseClickSound/>
 </Options>
+<Font>
 <FontData>
-<FontName>Microsoft Sans Serif</FontName>
+<FontName>Tahoma</FontName>
 <CharacterSet>0</CharacterSet>
 <Height>-11</Height>
 <Weight>400</Weight>
@@ -29789,6 +27653,7 @@ Window.Close(Application.GetWndHandle(), 1);</Script>
 <StrikeOut>0</StrikeOut>
 <AntiAlias>1</AntiAlias>
 </FontData>
+</Font>
 </Object>
 <HGuidelines/>
 <VGuidelines/>
@@ -29844,7 +27709,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <BuildType>2</BuildType>
 <DriveLetter/>
 <UsePassword>0</UsePassword>
-<OpenFolder>1</OpenFolder>
+<OpenFolder>0</OpenFolder>
 <ObscureFilenames>0</ObscureFilenames>
 <ObscureDataFolder>AutoPlay</ObscureDataFolder>
 </ProgramPrefs>
