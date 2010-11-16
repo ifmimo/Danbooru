@@ -15631,8 +15631,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>95</Top>
-<Bottom>118</Bottom>
+<Top>87</Top>
+<Bottom>110</Bottom>
 <Left>27</Left>
 <Right>90</Right>
 </Coordinates>
@@ -15721,8 +15721,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>95</Top>
-<Bottom>118</Bottom>
+<Top>87</Top>
+<Bottom>110</Bottom>
 <Left>27</Left>
 <Right>90</Right>
 </OriginalRect>
@@ -15743,8 +15743,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>97</Top>
-<Bottom>118</Bottom>
+<Top>89</Top>
+<Bottom>110</Bottom>
 <Left>125</Left>
 <Right>206</Right>
 </Coordinates>
@@ -15833,8 +15833,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>97</Top>
-<Bottom>118</Bottom>
+<Top>89</Top>
+<Bottom>110</Bottom>
 <Left>125</Left>
 <Right>206</Right>
 </OriginalRect>
@@ -15855,8 +15855,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>117</Top>
-<Bottom>138</Bottom>
+<Top>109</Top>
+<Bottom>130</Bottom>
 <Left>125</Left>
 <Right>210</Right>
 </Coordinates>
@@ -15945,8 +15945,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>117</Top>
-<Bottom>138</Bottom>
+<Top>109</Top>
+<Bottom>130</Bottom>
 <Left>125</Left>
 <Right>210</Right>
 </OriginalRect>
@@ -15967,8 +15967,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>137</Top>
-<Bottom>158</Bottom>
+<Top>129</Top>
+<Bottom>150</Bottom>
 <Left>125</Left>
 <Right>251</Right>
 </Coordinates>
@@ -16057,8 +16057,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>137</Top>
-<Bottom>158</Bottom>
+<Top>129</Top>
+<Bottom>150</Bottom>
 <Left>125</Left>
 <Right>251</Right>
 </OriginalRect>
@@ -16079,8 +16079,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>165</Top>
-<Bottom>188</Bottom>
+<Top>177</Top>
+<Bottom>200</Bottom>
 <Left>27</Left>
 <Right>118</Right>
 </Coordinates>
@@ -16169,8 +16169,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>165</Top>
-<Bottom>188</Bottom>
+<Top>177</Top>
+<Bottom>200</Bottom>
 <Left>27</Left>
 <Right>118</Right>
 </OriginalRect>
@@ -16191,8 +16191,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>167</Top>
-<Bottom>188</Bottom>
+<Top>179</Top>
+<Bottom>200</Bottom>
 <Left>125</Left>
 <Right>198</Right>
 </Coordinates>
@@ -16281,8 +16281,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>167</Top>
-<Bottom>188</Bottom>
+<Top>179</Top>
+<Bottom>200</Bottom>
 <Left>125</Left>
 <Right>198</Right>
 </OriginalRect>
@@ -16585,6 +16585,118 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Bottom>41</Bottom>
 <Left>216</Left>
 <Right>392</Right>
+</OriginalRect>
+</Text>
+</Object>
+<Object>
+<Type>1</Type>
+<Name>Label9</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>1</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>149</Top>
+<Bottom>170</Bottom>
+<Left>125</Left>
+<Right>212</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>11776</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1852139636</DesignCodeLine>
+<DesignCodeCol>3040512</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1845505636</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Text>
+<Body>Amy Prismriver</Body>
+<NormalColor>8421504</NormalColor>
+<HighlightColor>8421504</HighlightColor>
+<MouseDownColor>8421504</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<Orientation>0</Orientation>
+<AutoSize>1</AutoSize>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+<OriginalRect>
+<Top>149</Top>
+<Bottom>170</Bottom>
+<Left>125</Left>
+<Right>212</Right>
 </OriginalRect>
 </Text>
 </Object>
@@ -27700,7 +27812,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <TimeStampFilesCDRW>0</TimeStampFilesCDRW>
 <TimeStampFilesISO>0</TimeStampFilesISO>
 <ISOImageFile/>
-<SelfExtractingZIPfile>C:\Users\Shadiku\Documents\Danbooru SVN\danbooru.exe</SelfExtractingZIPfile>
+<SelfExtractingZIPfile>C:\Users\Shadiku\Documents\Git projects\Danbooru (binary)\danbooru.exe</SelfExtractingZIPfile>
 <ZIPMessage>Loading</ZIPMessage>
 <ZIPShowProgress>0</ZIPShowProgress>
 <CDVolumeIdentifier>NEWDISC</CDVolumeIdentifier>
@@ -27709,7 +27821,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <BuildType>2</BuildType>
 <DriveLetter/>
 <UsePassword>0</UsePassword>
-<OpenFolder>0</OpenFolder>
+<OpenFolder>1</OpenFolder>
 <ObscureFilenames>0</ObscureFilenames>
 <ObscureDataFolder>AutoPlay</ObscureDataFolder>
 </ProgramPrefs>
