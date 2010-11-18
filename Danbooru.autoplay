@@ -709,7 +709,11 @@ function Danbooru.Post(Tags, Limit, Page, API)
 					return CensoredReturnTable;
 				end
 			else
-				return false, "Failed to parse JSON return.";
+				if (String.Find(Return, "&lt;title&gt;Downbooru&lt;/title&gt;", 1, true) ~= -1) then
+					return false, "The site is down for maintenance.";
+				else
+					return false, "Failed to parse JSON return.";
+				end
 			end
 		elseif (API.Type == "XML") then
 			XML.SetXML(Return);
@@ -1157,8 +1161,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>13</DesignCodeLine>
-<DesignCodeCol>116</DesignCodeCol>
+<DesignCodeLine>646</DesignCodeLine>
+<DesignCodeCol>53</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -7101,7 +7105,7 @@ end</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>69</DesignCodeLine>
-<DesignCodeCol>70</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
