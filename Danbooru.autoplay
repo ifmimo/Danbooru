@@ -65,14 +65,23 @@
 <Globals>
 <Script>--[[
 
-	Danbooru desktop client, original work by Shadiku Izayoi.
+	Danbooru desktop client (danbooru-desktop-src)
 	
-	WARNING:	The code here is hardly commented (if at all)
-				and may cause random frustration when trying to
-				add new features.
-				
-	Licensed under the Creative Commons. (BY-NC-SA 3.0)
+	Copyright (C) 2010 Shadiku Izayoi.
 	
+	Contributers:	Shadiku Izayoi &lt;blackhawk.delta@gmail.com&gt;
+					Amy Prismriver &lt;amy.prismriver@gmail.com&gt;
+					Edward Parkes &lt;wolvenhound.edwardparkes@googlemail.com&gt;
+
+	This software is licensed under the terms of the GNU General Public
+	License version 2, as published by the Free Software Foundation, and
+	may be copied, distributed, and modified under those terms.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
 ]]--
 
 -- Define Danbooru tables.
@@ -1161,8 +1170,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>60</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>6</DesignCodeLine>
+<DesignCodeCol>30</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
