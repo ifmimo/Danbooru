@@ -1168,7 +1168,7 @@ end</Script>
 <StartupPage>_PageFirst</StartupPage>
 <MouseOverSoundDefault>AutoPlay\Audio\mp_ingame_summary.wav</MouseOverSoundDefault>
 <MouseClickSoundDefault>AutoPlay\Audio\mp_ingame_summary.wav</MouseClickSoundDefault>
-<MemMngMethod>1</MemMngMethod>
+<MemMngMethod>0</MemMngMethod>
 <UserPrivilegeLevel>0</UserPrivilegeLevel>
 </Defaults>
 <TargetMedia>
