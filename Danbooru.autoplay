@@ -5524,9 +5524,21 @@ if (t_tblChecked) then
 	end
 	
 	function Download.OnError(tblData)
+		local s_strTableExport = "";
+		
+		for K, V in pairs(tblData) do
+			if (s_strTableExport == "") then
+				s_strTableExport = s_strTableExport.."\""..tostring(K).."\" = \""..tostring(V).."\"";
+			else
+				s_strTableExport = s_strTableExport.."\r\n\""..tostring(K).."\" = \""..tostring(V).."\"";
+			end
+		end
+		
 		Download.Delete(tblData.Session);
-		Dialog.Message("Danbooru", "The download failed for an unknown reason.\r\n\r\nPlease report this and what you did to get this error right away!", 0, 16, 0);
-		__DOWNLOAD = false;
+		
+		Dialog.Message("Danbooru", "The download failed for an unknown reason.\r\n\r\nPlease report what you did to get this error right away, please also include the following information.\r\n\r\n"..s_strTableExport.."\r\n", 0, 16, 0);
+		
+		--__DOWNLOAD = false; (removing this to see if it keeps downloading images) ~Amy
 	end
 	
 	-- Start processing the queue.
@@ -5551,8 +5563,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>132</DesignCodeLine>
-<DesignCodeCol>26</DesignCodeCol>
+<DesignCodeLine>238</DesignCodeLine>
+<DesignCodeCol>2</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
