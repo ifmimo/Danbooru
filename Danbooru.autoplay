@@ -119,12 +119,12 @@ Danbooru.Icons.Gelbooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\gelbooru.ico")
 Danbooru.Icons.Blacklisted = ListIcon.LoadImage(6, "AutoPlay\\Images\\exclamation.png");
 
 -- Danbooru imageboard sources, these only need be defined here and the icon defined above. (r18)
-Danbooru.API.Danbooru = {Type = "JSON", Name = "Danbooru", Main = "http://danbooru.donmai.us/", Post = "http://danbooru.donmai.us/post/index.json", Pool = "http://danbooru.donmai.us/pool/index.xml", Notes = "http://danbooru.donmai.us/note/index.json", FavoriteList = "http://danbooru.donmai.us/favorite/list_users.json"};
-Danbooru.API.MoeImouto = {Type = "JSON", Name = "Moe Imouto", Main = "http://moe.imouto.org/", Post = "http://moe.imouto.org/post/index.json", Pool = "http://moe.imouto.org/pool/index.xml", Notes = "http://moe.imouto.org/note/index.json", FavoriteList = "http://moe.imouto.org/favorite/list_users.json"};
-Danbooru.API.Konachan = {Type = "JSON", Name = "Konachan", Main = "http://konachan.com/", Post = "http://konachan.com/post/index.json", Pool = "http://konachan.com/pool/index.xml", Notes = "http://konachan.com/note/index.json", FavoriteList = "http://konachan.com/favorite/list_users.json"};
-Danbooru.API.Sankaku = {Type = "JSON", Name = "Sankaku Channel", Main = "http://chan.sankakucomplex.com/", Post = "http://chan.sankakucomplex.com/post/index.json", Pool = "http://chan.sankakucomplex.com/pool/index.xml", Notes = "http://chan.sankakucomplex.com/note/index.json", FavoriteList = "http://chan.sankakucomplex.com/favorite/list_users.json"};
-Danbooru.API.Nekobooru = {Type = "JSON", Name = "Nekobooru", Main = "http://nekobooru.net", Post = "http://nekobooru.net/post/index.json", Pool = "http://nekobooru.net/pool/index.xml", Notes = "http://nekobooru.net/note/index.json", FavoriteList = "http://nekobooru.net/favorite/list_users.json"};
-Danbooru.API.Gelbooru = {Type = "XML", Name = "Gelbooru", Main = "http://gelbooru.com/", Post = "http://gelbooru.com/index.php"};
+Danbooru.API.Danbooru = {Type = "JSON", Name = "Danbooru", Main = "http://danbooru.donmai.us/", Post = "http://danbooru.donmai.us/post/index.json", Pool = "http://danbooru.donmai.us/pool/index.xml", Notes = "http://danbooru.donmai.us/note/index.json", FavoriteList = "http://danbooru.donmai.us/favorite/list_users.json", MaxTags = 2};
+Danbooru.API.MoeImouto = {Type = "JSON", Name = "Moe Imouto", Main = "http://moe.imouto.org/", Post = "http://moe.imouto.org/post/index.json", Pool = "http://moe.imouto.org/pool/index.xml", Notes = "http://moe.imouto.org/note/index.json", FavoriteList = "http://moe.imouto.org/favorite/list_users.json", MaxTags = 2};
+Danbooru.API.Konachan = {Type = "JSON", Name = "Konachan", Main = "http://konachan.com/", Post = "http://konachan.com/post/index.json", Pool = "http://konachan.com/pool/index.xml", Notes = "http://konachan.com/note/index.json", FavoriteList = "http://konachan.com/favorite/list_users.json", MaxTags = 6};
+Danbooru.API.Sankaku = {Type = "JSON", Name = "Sankaku Channel", Main = "http://chan.sankakucomplex.com/", Post = "http://chan.sankakucomplex.com/post/index.json", Pool = "http://chan.sankakucomplex.com/pool/index.xml", Notes = "http://chan.sankakucomplex.com/note/index.json", FavoriteList = "http://chan.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
+Danbooru.API.Nekobooru = {Type = "JSON", Name = "Nekobooru", Main = "http://nekobooru.net", Post = "http://nekobooru.net/post/index.json", Pool = "http://nekobooru.net/pool/index.xml", Notes = "http://nekobooru.net/note/index.json", FavoriteList = "http://nekobooru.net/favorite/list_users.json", MaxTags = 2};
+Danbooru.API.Gelbooru = {Type = "XML", Name = "Gelbooru", Main = "http://gelbooru.com/", Post = "http://gelbooru.com/index.php"}; -- No idea here since all other imageboards gave HTTP 500 error when exceeding the maximum tags.. ~Amy
 
 -- Populate sources table.
 Danbooru.Sources = {};
@@ -1161,8 +1161,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>646</DesignCodeLine>
-<DesignCodeCol>53</DesignCodeCol>
+<DesignCodeLine>60</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -7084,7 +7084,7 @@ else
 	for K, V in pairs(Danbooru.Sources) do
 		if ((V == true) and (Danbooru.API[K]) and (Danbooru.Icons[K])) then
 			Paragraph.SetText("Paragraph1", "Querying "..Danbooru.API[K].Name.."..");
-			Danbooru.QueryAndInsert(Danbooru.API[K], Danbooru.Icons[K], Query);
+			Danbooru.QueryAndInsert(Danbooru.API[K], Danbooru.Icons[K], Query, Danbooru.API[K].MaxTags);
 		end
 	end
 	
@@ -7105,7 +7105,7 @@ end</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>69</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeCol>86</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
