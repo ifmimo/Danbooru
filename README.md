@@ -1,7 +1,7 @@
 Danbooru desktop client
 =================
 
-[(This is the source code repository, if you are looking for pre-compiled binaries, click here.)][1]
+[(This is the source code branch, if you are looking for pre-compiled binaries, click here.)][1]
 
 A program that utilises the Danbooru API, written in Lua using the [AutoPlay Media Studio 8.0][2] IDE.
 
@@ -17,7 +17,7 @@ Supports post searching using the following imageboards:
 Also allows you to download images in batch from seperate imageboards, view pools, see who favorited posts, search up to 1000 posts at one time, insert useful tags for searching and much more.
 
 
-  [1]: https://github.com/Shadiku/danbooru-desktop "danbooru-desktop @ GitHub"
+  [1]: https://github.com/Shadiku/danbooru-desktop/tree/binary "danbooru-desktop @ GitHub"
   [2]: autoplay.org "Freeware version available here."
   [3]: http://danbooru.donmai.us "Danbooru"
   [4]: http://konachan.com/ "Konachan"
