@@ -5436,7 +5436,7 @@ if (t_tblChecked) then
 				local t_tblTarget = Danbooru.Downloads.URLs[Danbooru.Downloads.Index] or {};
 				
 				-- Start the next download.
-				Danbooru.Downloads.SessionID = Download.Start(Application.GetWndHandle(), t_tblTarget.URL or "", t_tblTarget.Destination or "", Danbooru.UserAgent, "", "0", nil, 0, "", "");
+				Danbooru.Downloads.SessionID = Download.Start(Application.GetWndHandle(), t_tblTarget.URL or "", t_tblTarget.Destination or "", Danbooru.UserAgent, "", false, nil, 0, "", "");
 				__DOWNLOAD = true;
 				
 				-- Remove the current download from the queue.
@@ -5566,8 +5566,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>227</DesignCodeLine>
-<DesignCodeCol>233</DesignCodeCol>
+<DesignCodeLine>124</DesignCodeLine>
+<DesignCodeCol>49</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -5627,7 +5627,18 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Actions/>
+<Actions>
+<Action>
+<Type>0</Type>
+<Name>None</Name>
+<Exit>0</Exit>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+</Action>
+</Actions>
 <Options>
 <Text>Download</Text>
 <TextColor format="hex">000000</TextColor>
