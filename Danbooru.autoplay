@@ -5627,18 +5627,7 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Actions>
-<Action>
-<Type>0</Type>
-<Name>None</Name>
-<Exit>0</Exit>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-</Action>
-</Actions>
+<Actions/>
 <Options>
 <Text>Download</Text>
 <TextColor format="hex">000000</TextColor>
@@ -14169,22 +14158,35 @@ end</Script>
 <Event>
 <Name>On Hyperlink</Name>
 <Args>string e_Hyperlink</Args>
-<Script/>
+<Script>local i_intNumber = (tonumber(Input.GetText("Input2")));
+
+if (type(i_intNumber) == "number") then
+	Input.SetText("Input2", tostring(i_intNumber + 1));
+	Page.ClickObject(this);
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>5</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
 <Actions/>
 <Options>
-<Text>Search..</Text>
+<Text>            &lt;Grid&gt;
+                &lt;Grid.ColumnDefinitions&gt;
+                    &lt;ColumnDefinition Width="*"/&gt;
+                    &lt;ColumnDefinition Width="Auto"/&gt;
+                &lt;/Grid.ColumnDefinitions&gt;
+                &lt;TextBlock Text="Search" Margin="0,0,0,0"/&gt;
+
+                &lt;TextBlock Grid.Column="1" Margin="4,0,0,4"&gt;&lt;Hyperlink Foreground="#5c5c5c"&gt;&gt;&lt;/Hyperlink&gt;&lt;/TextBlock&gt;
+            &lt;/Grid&gt;</Text>
 <TextColor format="hex">000000</TextColor>
-<EnableMarkup>0</EnableMarkup>
+<EnableMarkup>1</EnableMarkup>
 <ButtonImage>AutoPlay\Images\magnifier.png</ButtonImage>
 <TextAlignment>2</TextAlignment>
 <ImageAlignment>0</ImageAlignment>
@@ -14352,7 +14354,7 @@ end</Script>
 <Top>528</Top>
 <Bottom>550</Bottom>
 <Left>0</Left>
-<Right>575</Right>
+<Right>651</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
