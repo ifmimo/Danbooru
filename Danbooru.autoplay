@@ -5568,7 +5568,7 @@ if (t_tblChecked) then
 		__DOWNLOAD = true;
 			
 		-- Start the first download.
-		Danbooru.Downloads.SessionID = Download.Start(Application.GetWndHandle(), Danbooru.Downloads.URLs[1].URL, Danbooru.Downloads.URLs[1].Destination, Danbooru.UserAgent, "", "0", nil, 0, "", "");
+		Danbooru.Downloads.SessionID = Download.Start(Application.GetWndHandle(), Danbooru.Downloads.URLs[1].URL, Danbooru.Downloads.URLs[1].Destination, Danbooru.UserAgent, "", false, nil, 0, "", "");
 	end
 end</Script>
 <TreeStates>
@@ -5576,7 +5576,7 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>238</DesignCodeLine>
+<DesignCodeLine>256</DesignCodeLine>
 <DesignCodeCol>2</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
@@ -5637,7 +5637,18 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Actions/>
+<Actions>
+<Action>
+<Type>0</Type>
+<Name>None</Name>
+<Exit>0</Exit>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+</Action>
+</Actions>
 <Options>
 <Text>Download</Text>
 <TextColor format="hex">000000</TextColor>
