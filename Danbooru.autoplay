@@ -1633,8 +1633,8 @@ Danbooru.SplashShown = true;</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>85</DesignCodeLine>
-<DesignCodeCol>28</DesignCodeCol>
+<DesignCodeLine>45</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1974,7 +1974,7 @@ if not (Danbooru.PerformedProtocol) and ((System.GetUserInfo().IsAdmin or System
 	
 	-- Check command-line arguments.
 	for K, V in pairs(_CommandLineArgs) do
-		-- Argument will be -url.
+		-- Argument will be --url.
 		if (V == "--url") then
 			-- Next argument will be the URL protocol.
 			if (_CommandLineArgs[K + 1]) then
@@ -2023,6 +2023,13 @@ if not (Danbooru.PerformedProtocol) and ((System.GetUserInfo().IsAdmin or System
 					Danbooru.Sources[s_strTargetImageboard] = true;
 					
 					Paragraph.SetText("Paragraph1", "Idle.");
+					
+					-- Update counters.
+					local function s(n) if (n == 1) then return "" else return "s" end end
+	
+					local i_intCount = Danbooru.ListIcon:CountRows();
+					
+					Paragraph.SetText("Paragraph2", "("..tostring(i_intCount).." item"..s(i_intCount)..", "..Table.Count(Danbooru.Blacklisted).." blacklisted)");
 				end
 			end
 		end
@@ -2036,8 +2043,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>90</DesignCodeLine>
-<DesignCodeCol>38</DesignCodeCol>
+<DesignCodeLine>386</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
