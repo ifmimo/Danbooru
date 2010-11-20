@@ -72,6 +72,7 @@
 	Contributers:	Shadiku Izayoi &lt;blackhawk.delta@gmail.com&gt;
 					Amy Prismriver &lt;amy.prismriver@gmail.com&gt;
 					Edward Parkes &lt;wolvenhound.edwardparkes@googlemail.com&gt;
+					Bas Groothedde &lt;bas@imagine-programming.com&gt;
 
 	This software is licensed under the terms of the GNU General Public
 	License version 2, as published by the Free Software Foundation, and
@@ -1175,8 +1176,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>126</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>9</DesignCodeLine>
+<DesignCodeCol>49</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
