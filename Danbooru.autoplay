@@ -150,19 +150,27 @@ end
 
 Border = ToolWindow;
 
+-- Rewritten explode function using a custom local pairs function (~Bas)
 function String.Explode(Seperator, InputString)
+	-- Return a table with one entry; InputString, if no valid Seperator was provided.
 	if(Seperator=="")then
 		return {InputString};
 	end
 	local intPosition = 0;
 	local arrResult   = {};
+	
+	-- A local function that will work as a pairs function. Returning a new location on each iteration.
 	local function FindAll()
 		return string.find(InputString,Seperator,intPosition,true);
 	end
+	
+	-- Loop through all the locations FindAll keeps returning, and add the strings at those positions to the result table.
 	for st,sp in FindAll do
 		arrResult[#arrResult+1]=string.sub(InputString,intPosition,st-1);
 		intPosition = sp+1;
 	end
+	
+	-- Process the last bit of string and return it.
 	arrResult[#arrResult+1]=string.sub(InputString,intPosition);
 	return arrResult;
 end
@@ -1170,8 +1178,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>86</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>107</DesignCodeLine>
+<DesignCodeCol>49</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
