@@ -490,7 +490,7 @@ function Danbooru.Post(Tags, Limit, Page, API)
 					local Count = tostring(Table.Count(Posts));
 					
 					for K, V in pairs(Posts) do
-						Paragraph.SetText("Paragraph1", "Parsing item "..K.."/"..Count.."..");
+						Paragraph.SetText("Paragraph1", Count - K.." items left in parsing queue..");
 						-- TODO: V.created_at, V.change
 						local Index = Table.Count(ReturnTable) + 1;
 						ReturnTable[Index] = {};
@@ -780,7 +780,7 @@ function Danbooru.Post(Tags, Limit, Page, API)
 						
 						if (tostring(Danbooru.Settings.UseGelbooruWorkaround) == "true") then
 							-- This is stupid, but I guess some people MIGHT want it.
-							Paragraph.SetText("Paragraph1", "Getting post file size.. ("..K.." / "..Count..")");
+							Paragraph.SetText("Paragraph1", "Getting post file size, "..Count - K.." items left..");
 							ReturnTable[Index].Size = HTTP.GetFileSize(ReturnTable[Index].URL, 0, 5, 80, nil, nil, nil);
 							ReturnTable[Index].FormattedSize = String.GetFormattedSize(ReturnTable[Index].Size, 1, true);
 						else
@@ -964,6 +964,8 @@ end
 
 -- Query post API, then insert into ListIcon.
 function Danbooru.QueryAndInsert(API, Icon, Query, MaxTags)
+	Paragraph.SetText("Paragraph1", "Querying "..API.Name.."..");
+	
 	if (MaxTags) then
 		if (Table.Count((String.Explode(" ", Query[1]) or {})) &gt; MaxTags) then
 			Dialog.Message("Error", API.Name.." restricts users to a maximum of "..MaxTags.." tags for search queries.", 0, 48, 0);
@@ -1178,8 +1180,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>107</DesignCodeLine>
-<DesignCodeCol>49</DesignCodeCol>
+<DesignCodeLine>717</DesignCodeLine>
+<DesignCodeCol>63</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -7167,7 +7169,6 @@ else
 	
 	for K, V in pairs(Danbooru.Sources) do
 		if ((V == true) and (Danbooru.API[K]) and (Danbooru.Icons[K])) then
-			Paragraph.SetText("Paragraph1", "Querying "..Danbooru.API[K].Name.."..");
 			Danbooru.QueryAndInsert(Danbooru.API[K], Danbooru.Icons[K], Query, Danbooru.API[K].MaxTags);
 		end
 	end
@@ -7188,8 +7189,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>69</DesignCodeLine>
-<DesignCodeCol>86</DesignCodeCol>
+<DesignCodeLine>68</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
