@@ -151,26 +151,20 @@ end
 Border = ToolWindow;
 
 function String.Explode(Seperator, InputString)
-	if (Seperator == "") then
+	if(Seperator=="")then
 		return {InputString};
 	end
-	
-	local DelimitedTable = {};
-	local Position = 0;
-	
-	while (true) do
-		CurrentPosition = string.find(InputString, Seperator, Position, true);
-		
-		if (CurrentPosition ~= nil) then
-			table.insert(DelimitedTable, string.sub(InputString, Position, CurrentPosition - 1));
-			Position = CurrentPosition + 1;
-		else
-			table.insert(DelimitedTable, string.sub(InputString, Position));
-			break;
-		end
+	local intPosition = 0;
+	local arrResult   = {};
+	local function FindAll()
+		return string.find(InputString,Seperator,intPosition,true);
 	end
-	
-	return DelimitedTable;
+	for st,sp in FindAll do
+		arrResult[#arrResult+1]=string.sub(InputString,intPosition,st-1);
+		intPosition = sp+1;
+	end
+	arrResult[#arrResult+1]=string.sub(InputString,intPosition);
+	return arrResult;
 end
 
 function Paragraph.Append(Object, Text)
@@ -1176,8 +1170,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>9</DesignCodeLine>
-<DesignCodeCol>49</DesignCodeCol>
+<DesignCodeLine>86</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
