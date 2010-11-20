@@ -1731,7 +1731,7 @@ function Danbooru.ListIcon.OnSelect(Row, Checked)
 	
 	-- Show an image in the preview object by loading HTML into it.
 	Web.LoadHTML("PreviewWeb1", [[&lt;html&gt;&lt;head&gt;&lt;style type="text/css"&gt;* { padding:0; margin:0;}
-	body {background: url(']].._SourceFolder.."\\AutoPlay\\Images\\loading.png"..[[') #000;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;img style="border: 1px #]]..HTMLColor..[[ solid;" src="]]..Danbooru.Posts[Row].Preview.URL..[[" width="98" height="98"&gt;&lt;/html&gt;]], false);
+	body {background: url(']].._SFXFolder.."\\AutoPlay\\Images\\loading.png"..[[') #000;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;img style="border: 1px #]]..HTMLColor..[[ solid;" src="]]..Danbooru.Posts[Row].Preview.URL..[[" width="98" height="98"&gt;&lt;/html&gt;]], false);
 	
 	-- Load post information into label objects.
 	Label.SetText("Label5", Table.Concat(Danbooru.Posts[Row].Tags or {}, " ", 1, -1));
@@ -2036,8 +2036,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>306</DesignCodeLine>
-<DesignCodeCol>93</DesignCodeCol>
+<DesignCodeLine>90</DesignCodeLine>
+<DesignCodeCol>38</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
