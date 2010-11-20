@@ -1947,7 +1947,7 @@ if (type(PoolData) == "table") then
 	
 	for K, V in pairs(Danbooru.Sources) do
 		if ((K == Imageboard) and (Danbooru.API[K]) and (Danbooru.Icons[K])) then
-			Danbooru.QueryAndInsert(Danbooru.API[K], Danbooru.Icons[K], Query);
+			Danbooru.QueryAndInsert(Danbooru.API[K], Danbooru.Icons[K], Query, Danbooru.API[K].MaxTags);
 			break;
 		end
 	end
@@ -2036,8 +2036,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>338</DesignCodeLine>
-<DesignCodeCol>58</DesignCodeCol>
+<DesignCodeLine>306</DesignCodeLine>
+<DesignCodeCol>93</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
