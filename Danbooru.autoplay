@@ -188,7 +188,12 @@ end
 -- Used to indicate that the program is downloading something.
 __INNER_HTTPACTION = true;
 
+-- Used to indicate if the program has parsed the --url argument already.
+Danbooru.PerformedProtocol = false;
+
 -- Check command line arguments and strip SFX path. (workaround)
+_SFXFolder = _SourceFolder;
+
 if (_CommandLineArgs) then
 	for K, V in pairs(_CommandLineArgs) do
 		if (string.find(V, "SFXSOURCE")) then
@@ -1170,8 +1175,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>6</DesignCodeLine>
-<DesignCodeCol>30</DesignCodeCol>
+<DesignCodeLine>126</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -1628,8 +1633,8 @@ Danbooru.SplashShown = true;</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>84</DesignCodeLine>
-<DesignCodeCol>38</DesignCodeCol>
+<DesignCodeLine>85</DesignCodeLine>
+<DesignCodeCol>28</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1955,14 +1960,84 @@ if (type(PoolData) == "table") then
 	Paragraph.SetText("Paragraph1", "Idle.");
 	
 	PoolData = nil;
+end
+
+-- If we're an administrator, register the URL protocol here.
+if not (Danbooru.PerformedProtocol) and ((System.GetUserInfo().IsAdmin or System.GetUserInfo().IsVistaAdminLimitedToken) and (tostring(Danbooru.Settings.UseURLHandler) == "true")) then
+	-- Register protocol.
+	Registry.SetValue(HKEY_CLASSES_ROOT, "danbooru", "", "URL:Danbooru Protocol", REG_SZ);
+	Registry.SetValue(HKEY_CLASSES_ROOT, "danbooru", "URL Protocol", "", REG_SZ);
+	Registry.SetValue(HKEY_CLASSES_ROOT, "danbooru\\DefaultIcon", "", "\"".._SourceFilename.."\,0", REG_SZ);
+	Registry.CreateKey(HKEY_CLASSES_ROOT, "danbooru\\shell");
+	Registry.CreateKey(HKEY_CLASSES_ROOT, "danbooru\\shell\\open");
+	Registry.SetValue(HKEY_CLASSES_ROOT, "danbooru\\shell\\open\\command", "", "\"".._SourceFilename.."\" --url \"%1\"", REG_SZ);
+	
+	-- Check command-line arguments.
+	for K, V in pairs(_CommandLineArgs) do
+		-- Argument will be -url.
+		if (V == "--url") then
+			-- Next argument will be the URL protocol.
+			if (_CommandLineArgs[K + 1]) then
+				-- Show progress.
+				Paragraph.SetText("Paragraph1", "Parsing URL protocol arguments..");
+				
+				-- Split the string up and work with it.
+				local t_tblTempSearchQuery = String.Explode("/", _CommandLineArgs[K + 1]);
+				
+				-- Define the target imageboard.
+				local s_strTargetImageboard;
+				local t_tblTargetImageboard;
+				
+				-- Define the search query.
+				local t_tblSearchQuery = {Imageboard = tostring(t_tblTempSearchQuery[3]), Query = Table.Concat(t_tblTempSearchQuery, " ", 4, -1)};
+				
+				-- Search for the target imageboard.
+				for K, V in pairs(Danbooru.API) do
+					if (tostring(K):lower() == t_tblSearchQuery.Imageboard:lower()) then
+						-- We need the key and value for QueryAndInsert.
+						s_strTargetImageboard, t_tblTargetImageboard = K, V;
+						
+						-- Match, stop looking.
+						break;
+					end
+				end
+				
+				-- Perform search.
+				if (t_tblTargetImageboard) then
+					-- Construct final query table.
+					local t_tblQuery = {t_tblSearchQuery.Query, (tonumber(Input.GetText("Input3") or 25)), (tonumber(Input.GetText("Input2") or 1))};
+					
+					-- Query /post and insert the resulting rows into the ListIcon.
+					Danbooru.QueryAndInsert(t_tblTargetImageboard, Danbooru.Icons[s_strTargetImageboard], t_tblQuery, t_tblTargetImageboard.MaxTags);
+					
+					-- Set the tags box to show the imageboard.
+					Input.SetText("Input1", t_tblSearchQuery.Query);
+					
+					-- Set the sources to the target imageboard only.
+					Danbooru.Sources = {};
+
+					for K, V in pairs(Danbooru.API) do
+						Danbooru.Sources[K] = false;
+					end
+					
+					Danbooru.Sources[s_strTargetImageboard] = true;
+					
+					Paragraph.SetText("Paragraph1", "Idle.");
+				end
+			end
+		end
+	end
+	
+	-- Finished.
+	Danbooru.PerformedProtocol = true;
 end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>239</DesignCodeLine>
-<DesignCodeCol>1</DesignCodeCol>
+<DesignCodeLine>338</DesignCodeLine>
+<DesignCodeCol>58</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -5627,18 +5702,7 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Actions>
-<Action>
-<Type>0</Type>
-<Name>None</Name>
-<Exit>0</Exit>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-</Action>
-</Actions>
+<Actions/>
 <Options>
 <Text>Download</Text>
 <TextColor format="hex">000000</TextColor>
@@ -24491,7 +24555,7 @@ DialogEx.Close(0);</Script>
 <VGuidelines/>
 </Page>
 </PageDialog>
-<PageDialog width="650" height="500" dialog_title="Danbooru - Settings" dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="480" min_height="300" fit_custom_mask_to_window="1" custom_mask="">
+<PageDialog width="650" height="530" dialog_title="Danbooru - Settings" dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="480" min_height="300" fit_custom_mask_to_window="1" custom_mask="">
 <Page>
 <Name>Settings</Name>
 <InheritObs/>
@@ -24513,7 +24577,7 @@ DialogEx.Close(0);</Script>
 <Event>
 <Name>On Preload</Name>
 <Args/>
-<Script>-- CheckBox1, CheckBox2, CheckBox3, CheckBox4, CheckBox5, CheckBox6, CheckBox7, CheckBox8, CheckBox9.
+<Script>-- CheckBox1, CheckBox2, CheckBox3, CheckBox4, CheckBox5, CheckBox6, CheckBox7, CheckBox8, CheckBox9, CheckBox10.
 CheckBox.SetChecked("CheckBox1", (tostring(Danbooru.Settings.RememberSourceSelection) == "true"));
 CheckBox.SetChecked("CheckBox2", (tostring(Danbooru.Settings.UseGelbooruWorkaround) == "true"));
 CheckBox.SetChecked("CheckBox3", (tostring(Danbooru.Settings.ShowSplashScreen) == "true"));
@@ -24523,6 +24587,7 @@ CheckBox.SetChecked("CheckBox6", (tostring(Danbooru.Settings.NoReplacePrompt) ==
 CheckBox.SetChecked("CheckBox7", (tostring(Danbooru.Settings.NeverGetNotes) == "true"));
 CheckBox.SetChecked("CheckBox8", (tostring(Danbooru.Settings.RememberTags) == "true"));
 CheckBox.SetChecked("CheckBox9", (tostring(Danbooru.Settings.RememberPageAndLimit) == "true"));
+CheckBox.SetChecked("CheckBox10", (tostring(Danbooru.Settings.UseURLHandler) == "true"));
 
 -- ComboBox1.
 local IsOverwrite = (tostring(Danbooru.Settings.NoReplaceType) == "overwrite");
@@ -24570,8 +24635,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>9</DesignCodeLine>
-<DesignCodeCol>81</DesignCodeCol>
+<DesignCodeLine>10</DesignCodeLine>
+<DesignCodeCol>31</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -24778,8 +24843,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>457</Top>
-<Bottom>501</Bottom>
+<Top>487</Top>
+<Bottom>531</Bottom>
 <Left>-1</Left>
 <Right>651</Right>
 </Coordinates>
@@ -24854,8 +24919,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>468</Top>
-<Bottom>491</Bottom>
+<Top>499</Top>
+<Bottom>522</Bottom>
 <Left>484</Left>
 <Right>559</Right>
 </Coordinates>
@@ -24893,6 +24958,7 @@ Danbooru.SetSettingsValue("NoReplacePrompt", CheckBox.GetChecked("CheckBox6"));
 Danbooru.SetSettingsValue("NeverGetNotes", CheckBox.GetChecked("CheckBox7"));
 Danbooru.SetSettingsValue("RememberTags", CheckBox.GetChecked("CheckBox8"));
 Danbooru.SetSettingsValue("RememberPageAndLimit", CheckBox.GetChecked("CheckBox9"));
+Danbooru.SetSettingsValue("UseURLHandler", CheckBox.GetChecked("CheckBox10"));
 
 Danbooru.SetSettingsValue("EnableNewColorRequest", RadioButton.GetChecked("RadioButton4"));
 Danbooru.SetSettingsValue("EnableNewStatusColor", RadioButton.GetChecked("RadioButton5"));
@@ -24913,7 +24979,7 @@ DialogEx.Close(0);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>26</DesignCodeLine>
+<DesignCodeLine>27</DesignCodeLine>
 <DesignCodeCol>27</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
@@ -25017,8 +25083,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>468</Top>
-<Bottom>491</Bottom>
+<Top>499</Top>
+<Bottom>522</Bottom>
 <Left>564</Left>
 <Right>639</Right>
 </Coordinates>
@@ -26136,8 +26202,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>269</Top>
-<Bottom>283</Bottom>
+<Top>292</Top>
+<Bottom>306</Bottom>
 <Left>125</Left>
 <Right>447</Right>
 </Coordinates>
@@ -26245,8 +26311,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>268</Top>
-<Bottom>287</Bottom>
+<Top>291</Top>
+<Bottom>310</Bottom>
 <Left>32</Left>
 <Right>110</Right>
 </Coordinates>
@@ -26335,8 +26401,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>268</Top>
-<Bottom>287</Bottom>
+<Top>291</Top>
+<Bottom>310</Bottom>
 <Left>32</Left>
 <Right>110</Right>
 </OriginalRect>
@@ -26357,8 +26423,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>291</Top>
-<Bottom>307</Bottom>
+<Top>314</Top>
+<Bottom>330</Bottom>
 <Left>125</Left>
 <Right>475</Right>
 </Coordinates>
@@ -26466,8 +26532,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>413</Top>
-<Bottom>432</Bottom>
+<Top>436</Top>
+<Bottom>455</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </Coordinates>
@@ -26556,8 +26622,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>413</Top>
-<Bottom>432</Bottom>
+<Top>436</Top>
+<Bottom>455</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </OriginalRect>
@@ -26578,8 +26644,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>410</Top>
-<Bottom>432</Bottom>
+<Top>433</Top>
+<Bottom>455</Bottom>
 <Left>124</Left>
 <Right>509</Right>
 </Coordinates>
@@ -26654,8 +26720,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>414</Top>
-<Bottom>429</Bottom>
+<Top>437</Top>
+<Bottom>452</Bottom>
 <Left>127</Left>
 <Right>506</Right>
 </Coordinates>
@@ -26736,8 +26802,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>314</Top>
-<Bottom>330</Bottom>
+<Top>337</Top>
+<Bottom>353</Bottom>
 <Left>125</Left>
 <Right>281</Right>
 </Coordinates>
@@ -26845,8 +26911,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>309</Top>
-<Bottom>330</Bottom>
+<Top>332</Top>
+<Bottom>353</Bottom>
 <Left>353</Left>
 <Right>499</Right>
 </Coordinates>
@@ -26957,8 +27023,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>309</Top>
-<Bottom>330</Bottom>
+<Top>332</Top>
+<Bottom>353</Bottom>
 <Left>282</Left>
 <Right>352</Right>
 </Coordinates>
@@ -27055,8 +27121,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>362</Top>
-<Bottom>377</Bottom>
+<Top>385</Top>
+<Bottom>400</Bottom>
 <Left>126</Left>
 <Right>426</Right>
 </Coordinates>
@@ -27164,8 +27230,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>383</Top>
-<Bottom>398</Bottom>
+<Top>406</Top>
+<Bottom>421</Bottom>
 <Left>126</Left>
 <Right>426</Right>
 </Coordinates>
@@ -27273,8 +27339,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>362</Top>
-<Bottom>381</Bottom>
+<Top>385</Top>
+<Bottom>404</Bottom>
 <Left>32</Left>
 <Right>94</Right>
 </Coordinates>
@@ -27363,8 +27429,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>362</Top>
-<Bottom>381</Bottom>
+<Top>385</Top>
+<Bottom>404</Bottom>
 <Left>32</Left>
 <Right>94</Right>
 </OriginalRect>
@@ -27603,8 +27669,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>15</AutoResize>
 <Coordinates>
-<Top>337</Top>
-<Bottom>353</Bottom>
+<Top>360</Top>
+<Bottom>376</Bottom>
 <Left>125</Left>
 <Right>475</Right>
 </Coordinates>
@@ -27780,6 +27846,117 @@ end</Script>
 <Actions/>
 <Options>
 <Text>Remember the current Page and Limit when closing the application.</Text>
+<NormalColor format="hex">000000</NormalColor>
+<HighlightColor format="hex">000000</HighlightColor>
+<MouseDownColor format="hex">000000</MouseDownColor>
+<Disabled format="hex">c0c0c0</Disabled>
+<Alignment>0</Alignment>
+<ButtonAlign>0</ButtonAlign>
+<RTLReadingOrder>0</RTLReadingOrder>
+<Checked>0</Checked>
+<MouseOverSoundMode>0</MouseOverSoundMode>
+<MouseOverSound/>
+<MouseClickSoundMode>0</MouseClickSoundMode>
+<MouseClickSound/>
+</Options>
+<Font>
+<FontData>
+<FontName>Tahoma</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-11</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+</Font>
+</Object>
+<Object>
+<Type>15</Type>
+<Name>CheckBox10</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>15</AutoResize>
+<Coordinates>
+<Top>262</Top>
+<Bottom>278</Bottom>
+<Left>125</Left>
+<Right>475</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script>if (CheckBox.GetChecked(this) == true) then
+	Dialog.Message("Danbooru", "Please ensure that the program is in a location that will not be changed.\r\n\r\nIf the program is moved the URL Protocol will not work.", 0, 16, 0);
+end</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>1</DesignCodeLine>
+<DesignCodeCol>178</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Options>
+<Text>Register danbooru:// URLs to open this program.</Text>
 <NormalColor format="hex">000000</NormalColor>
 <HighlightColor format="hex">000000</HighlightColor>
 <MouseDownColor format="hex">000000</MouseDownColor>
