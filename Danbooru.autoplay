@@ -16214,7 +16214,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Top>179</Top>
 <Bottom>200</Bottom>
 <Left>125</Left>
-<Right>198</Right>
+<Right>286</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -16278,7 +16278,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 </Event>
 <Actions/>
 <Text>
-<Body>Robert Styler</Body>
+<Body>Robert Styler and John Stokes</Body>
 <NormalColor>8421504</NormalColor>
 <HighlightColor>8421504</HighlightColor>
 <MouseDownColor>8421504</MouseDownColor>
@@ -16304,7 +16304,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Top>179</Top>
 <Bottom>200</Bottom>
 <Left>125</Left>
-<Right>198</Right>
+<Right>266</Right>
 </OriginalRect>
 </Text>
 </Object>
