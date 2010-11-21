@@ -15466,7 +15466,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Top>39</Top>
 <Bottom>58</Bottom>
 <Left>20</Left>
-<Right>123</Right>
+<Right>164</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -15475,14 +15475,14 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script/>
+<Script>File.OpenURL("http://shadiku.com/updates/");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>44</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -15495,7 +15495,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeLine>0</DesignCodeLine>
 <DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
@@ -15510,7 +15510,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>1073744397</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -15524,13 +15524,13 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>2573</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
 <Actions/>
 <Text>
-<Body>Unknown revision.</Body>
+<Body>Click here to view updates.</Body>
 <NormalColor>8421504</NormalColor>
 <HighlightColor>8421504</HighlightColor>
 <MouseDownColor>8421504</MouseDownColor>
@@ -15556,7 +15556,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Top>39</Top>
 <Bottom>58</Bottom>
 <Left>20</Left>
-<Right>123</Right>
+<Right>164</Right>
 </OriginalRect>
 </Text>
 </Object>
