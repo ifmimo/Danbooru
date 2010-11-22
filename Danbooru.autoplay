@@ -23901,7 +23901,9 @@ Danbooru.SelectionListIcon:AddColumn("URL", 200);
 
 -- Add data.
 for K, V in pairs(Danbooru.Sources) do
-	Danbooru.SelectionListIcon:AddRow(K..NEXT_CELL..Danbooru.API[K].Main, Danbooru.Icons[K]);
+	if (Danbooru.API[K]) then
+		Danbooru.SelectionListIcon:AddRow(K..NEXT_CELL..Danbooru.API[K].Main, Danbooru.Icons[K]);
+	end
 end
 
 -- Check rows.
@@ -23917,8 +23919,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>15</DesignCodeLine>
-<DesignCodeCol>48</DesignCodeCol>
+<DesignCodeLine>10</DesignCodeLine>
+<DesignCodeCol>4</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
