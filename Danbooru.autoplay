@@ -124,6 +124,7 @@ Danbooru.Icons.Konachan = ListIcon.LoadImage(6, "AutoPlay\\Icons\\konachan.ico")
 Danbooru.Icons.Sankaku = ListIcon.LoadImage(6, "AutoPlay\\Icons\\sankaku.ico");
 Danbooru.Icons.Nekobooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\nekobooru.ico");
 Danbooru.Icons.Gelbooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\gelbooru.ico");
+Danbooru.Icons.Genso = ListIcon.LoadImage(6, "AutoPlay\\Icons\\genso.ico");
 
 -- Icon for blacklisted posts.
 Danbooru.Icons.Blacklisted = ListIcon.LoadImage(6, "AutoPlay\\Images\\exclamation.png");
@@ -135,6 +136,7 @@ Danbooru.API.Konachan = {Type = "JSON", Name = "Konachan", Main = "http://konach
 Danbooru.API.Sankaku = {Type = "JSON", Name = "Sankaku Channel", Main = "http://chan.sankakucomplex.com/", Post = "http://chan.sankakucomplex.com/post/index.json", Pool = "http://chan.sankakucomplex.com/pool/index.xml", Notes = "http://chan.sankakucomplex.com/note/index.json", FavoriteList = "http://chan.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
 Danbooru.API.Nekobooru = {Type = "JSON", Name = "Nekobooru", Main = "http://nekobooru.net", Post = "http://nekobooru.net/post/index.json", Pool = "http://nekobooru.net/pool/index.xml", Notes = "http://nekobooru.net/note/index.json", FavoriteList = "http://nekobooru.net/favorite/list_users.json", MaxTags = 2};
 Danbooru.API.Gelbooru = {Type = "XML", Name = "Gelbooru", Main = "http://gelbooru.com/", Post = "http://gelbooru.com/index.php"}; -- No idea here since all other imageboards gave HTTP 500 error when exceeding the maximum tags.. ~Amy
+Danbooru.API.Genso = {Type = "JSON", Name = "Akyu Genso", Main = "http://genso.ws", Post = "http://genso.ws/post/index.json", Pool = "http://genso.ws/pool/index.xml", Notes = "http://genso.ws/note/index.json", FavoriteList = "http://genso.ws/favorite/list_users.json", MaxTags = 2};
 
 -- Populate sources table.
 Danbooru.Sources = {};
@@ -1180,8 +1182,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>717</DesignCodeLine>
-<DesignCodeCol>63</DesignCodeCol>
+<DesignCodeLine>73</DesignCodeLine>
+<DesignCodeCol>280</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>

@@ -13,6 +13,7 @@ Supports post searching using the following imageboards:
   - [Gelbooru][6] (gelbooru.com)
   - [Sankaku Channel][7] (chan.sankakucomplex.com)
   - [Nekobooru][8] (nekobooru.net)
+  - [Akyu Genso][9] (genso.ws)
 
 Also allows you to download images in batch from seperate imageboards, view pools, see who favorited posts, search up to 1000 posts at one time, insert useful tags for searching and much more.
 
@@ -25,3 +26,4 @@ Also allows you to download images in batch from seperate imageboards, view pool
   [6]: http://gelbooru.com "Gelbooru"
   [7]: http://chan.sankakucomplex.com "Sankaku Channel"
   [8]: http://nekobooru.net "Nekobooru"
+  [9]: http://genso.ws "Akyu Genso"
