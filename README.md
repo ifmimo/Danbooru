@@ -12,8 +12,9 @@ Supports post searching using the following imageboards:
   - [Moe Imouto][5] (moe.imouto.org)
   - [Gelbooru][6] (gelbooru.com)
   - [Sankaku Channel][7] (chan.sankakucomplex.com)
-  - [Nekobooru][8] (nekobooru.net)
-  - [Akyu Genso][9] (genso.ws)
+  - [Idol Complex][8] (idol.sankakucomplex.com)
+  - [Nekobooru][9] (nekobooru.net)
+  - [Akyu Genso][10] (genso.ws)
 
 Also allows you to download images in batch from seperate imageboards, view pools, see who favorited posts, search up to 1000 posts at one time, insert useful tags for searching and much more.
 
@@ -25,5 +26,6 @@ Also allows you to download images in batch from seperate imageboards, view pool
   [5]: http://moe.imouto.org "Moe Imouto"
   [6]: http://gelbooru.com "Gelbooru"
   [7]: http://chan.sankakucomplex.com "Sankaku Channel"
-  [8]: http://nekobooru.net "Nekobooru"
-  [9]: http://genso.ws "Akyu Genso"
+  [8]: http://idol.sankakucomplex.com "Idol Complex"
+  [9]: http://nekobooru.net "Nekobooru"
+  [10]: http://genso.ws "Akyu Genso"
