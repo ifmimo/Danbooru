@@ -733,7 +733,7 @@ function Danbooru.Post(Tags, Limit, Page, API)
 				if (String.Find(Return, "&lt;title&gt;Downbooru&lt;/title&gt;", 1, true) ~= -1) then
 					return false, "The site is down for maintenance.";
 				else
-					return false, "Failed to parse JSON return.";
+					return false, "Failed to parse JSON return.", Return;
 				end
 			end
 		elseif (API.Type == "XML") then
@@ -977,11 +977,23 @@ function Danbooru.QueryAndInsert(API, Icon, Query, MaxTags)
 		end
 	end
 	
-	local Results, Error = Danbooru.Post(Query[1], Query[2], Query[3], API);
+	local Results, Error, PossibleReturn = Danbooru.Post(Query[1], Query[2], Query[3], API);
 	
 	if (Results == false) then
 		if (API.Type ~= "XML") then
-			Dialog.Message("Error", "An error occured while querying the "..API.Name.." API.\r\n\r\n"..tostring(Error), 0, 48, 0);
+			if (PossibleReturn) then
+				if (Dialog.Message("Error", "There was a problem with getting posts.\r\n\r\nWould you like to copy diagnostic information for a bug report to the clipboard?", MB_YESNO, 32, 0) == IDYES) then
+					Clipboard.CopyText(API.Name.." query failure!\r\n\r\n"..tostring(PossibleReturn).."\r\n\r\n"..System.GetDate(1).." - "..System.GetTime(1));
+					
+					if (Application.GetLastError() ~= 0) then
+						Dialog.Message("Error", "Well this is embarassing.. Seems we couldn't even copy the text to the clipboard!\r\n\r\nDamn you Windows!", 0, 48, 0);
+					else
+						Dialog.Message("Danbooru", "Copied data to clipboard.\r\n\r\nPlease visit: http://shadiku.com/contact to report this bug with your clipboard information.", 0, 64, 0);
+					end
+				end
+			else
+				Dialog.Message("Error", "An error occured while querying the "..API.Name.." API.\r\n\r\n"..tostring(Error), 0, 48, 0);
+			end
 		end
 	else
 		for K, V in pairs(Results) do
@@ -1184,8 +1196,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>59</DesignCodeLine>
-<DesignCodeCol>26</DesignCodeCol>
+<DesignCodeLine>920</DesignCodeLine>
+<DesignCodeCol>142</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -1202,6 +1214,7 @@ end</Script>
 <CurrentGrounp>0</CurrentGrounp>
 </Group>
 <ActionPlugins>
+<Plugin>Clipboard\Clipboard.lmd</Plugin>
 <Plugin>Download\Download.lmd</Plugin>
 <Plugin>ListIcon\ListIcon.lmd</Plugin>
 </ActionPlugins>
@@ -7193,8 +7206,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>68</DesignCodeLine>
-<DesignCodeCol>3</DesignCodeCol>
+<DesignCodeLine>80</DesignCodeLine>
+<DesignCodeCol>1</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
