@@ -27935,22 +27935,13 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <ShowHelpBtn>0</ShowHelpBtn>
 <HelpURL>http://www.yourdomain.com/help.htm</HelpURL>
 <MissingTechItem>
-<FileName>FlashAX.det</FileName>
-<TechName>Adobe Flash ActiveX Control</TechName>
-<MinVer>6.0.0.0</MinVer>
-<Message>Click here to download the newest Flash control.</Message>
-<Link>http://get.adobe.com/flashplayer/</Link>
-<Variable>_FlashVer</Variable>
-<Required>0</Required>
-</MissingTechItem>
-<MissingTechItem>
 <FileName>IE.det</FileName>
 <TechName>Internet Explorer ActiveX Control</TechName>
 <MinVer>4.1.0.0</MinVer>
 <Message>Click here to download Internet Explorer.</Message>
 <Link>http://www.microsoft.com</Link>
 <Variable>_InternetExplorerVer</Variable>
-<Required>1</Required>
+<Required>0</Required>
 </MissingTechItem>
 </MissingTechs>
 <ProgramPrefs>
