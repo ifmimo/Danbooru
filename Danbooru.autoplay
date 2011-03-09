@@ -5501,9 +5501,6 @@ if (t_tblChecked) then
 				s_strDestination = s_strMD5Destination;
 			end
 			
-			-- debug.
-			Dialog.Message("", s_strDestination.." ("..s_strDestination:len()..")");
-			
 			-- Confirm the file doesn't already exist.
 			if (File.DoesExist(s_strTagDestination)) or (File.DoesExist(s_strMD5Destination)) then
 				if (tostring(Danbooru.Settings.NoReplacePrompt) == "true") then
@@ -5721,8 +5718,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>46</DesignCodeLine>
-<DesignCodeCol>50</DesignCodeCol>
+<DesignCodeLine>69</DesignCodeLine>
+<DesignCodeCol>6</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -19801,18 +19798,7 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Actions>
-<Action>
-<Type>0</Type>
-<Name>None</Name>
-<Exit>0</Exit>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-</Action>
-</Actions>
+<Actions/>
 <Options>
 <Text>Save images with their tags for filenames instead of MD5 hash.</Text>
 <NormalColor format="hex">000000</NormalColor>
