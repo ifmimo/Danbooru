@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="iso-8859-1"?><DocumentData>
-<ProductVersion>8.0.2.0</ProductVersion>
+<ProductVersion>8.0.4.0</ProductVersion>
 <ProductID>{ABF9EF9E-ECF6-4019-8A3E-908A6CFF4D1A}</ProductID>
 <IRProductName>AutoPlay Media Studio 8</IRProductName>
 <ProductType>Commercial</ProductType>
 <DocInfo>
 <Title>Danbooru</Title>
 <Author>Shadiku "Akira" Izayoi</Author>
-<Company>Source Laboratories</Company>
-<Copyright>Copyright © 2010, Source Laboratories.</Copyright>
+<Company>Illusion Programming</Company>
+<Copyright>Copyright © 2011, Illusion Programming.</Copyright>
 <URL>http://www.shadiku.com/</URL>
-<Email>shadiku@source-laboratories.org</Email>
+<Email>shadiku@gensokyo.co.uk</Email>
 <Comments/>
 <CreatedVersion>7.5.1006.0 (Professional Edition Commercial)</CreatedVersion>
-<LastSavedVersion>8.0.2.0 (Professional Edition Commercial)</LastSavedVersion>
+<LastSavedVersion>8.0.4.0 (Professional Edition Commercial)</LastSavedVersion>
 </DocInfo>
 <ProjectInfo ToolTipStyle="2">
 <Office2007Theme Theme="3"/>
@@ -65,9 +65,9 @@
 <Globals>
 <Script>--[[
 
-	Danbooru desktop client (danbooru-desktop-src)
+	Danbooru desktop client (danbooru-desktop)
 	
-	Copyright (C) 2010 Shadiku Izayoi.
+	Copyright (C) 2011 Illusion Programming.
 	
 	Contributers:	Shadiku Izayoi &lt;blackhawk.delta@gmail.com&gt;
 					Amy Prismriver &lt;amy.prismriver@gmail.com&gt;
@@ -119,7 +119,7 @@ Danbooru.ThumbnailHeight = 200;
 
 -- Icons for imageboards.
 Danbooru.Icons.Danbooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\danbooru.ico");
-Danbooru.Icons.MoeImouto = ListIcon.LoadImage(6, "AutoPlay\\Icons\\moe.ico");
+Danbooru.Icons.OrenoImouto = ListIcon.LoadImage(6, "AutoPlay\\Icons\\moe.ico");
 Danbooru.Icons.Konachan = ListIcon.LoadImage(6, "AutoPlay\\Icons\\konachan.ico");
 Danbooru.Icons.Sankaku = ListIcon.LoadImage(6, "AutoPlay\\Icons\\sankaku.ico");
 Danbooru.Icons.IdolComplex = Danbooru.Icons.Sankaku;
@@ -132,7 +132,7 @@ Danbooru.Icons.Blacklisted = ListIcon.LoadImage(6, "AutoPlay\\Images\\exclamatio
 
 -- Danbooru imageboard sources, these only need be defined here and the icon defined above. (r18)
 Danbooru.API.Danbooru = {Type = "JSON", Name = "Danbooru", Main = "http://danbooru.donmai.us/", Post = "http://danbooru.donmai.us/post/index.json", Pool = "http://danbooru.donmai.us/pool/index.xml", Notes = "http://danbooru.donmai.us/note/index.json", FavoriteList = "http://danbooru.donmai.us/favorite/list_users.json", MaxTags = 2};
-Danbooru.API.MoeImouto = {Type = "JSON", Name = "Moe Imouto", Main = "http://moe.imouto.org/", Post = "http://moe.imouto.org/post/index.json", Pool = "http://moe.imouto.org/pool/index.xml", Notes = "http://moe.imouto.org/note/index.json", FavoriteList = "http://moe.imouto.org/favorite/list_users.json", MaxTags = 2};
+Danbooru.API.OrenoImouto = {Type = "JSON", Name = "Oreno Imouto", Main = "http://oreno.imouto.org/", Post = "http://oreno.imouto.org/post/index.json", Pool = "http://oreno.imouto.org/pool/index.xml", Notes = "http://oreno.imouto.org/note/index.json", FavoriteList = "http://oreno.imouto.org/favorite/list_users.json", MaxTags = 2};
 Danbooru.API.Konachan = {Type = "JSON", Name = "Konachan", Main = "http://konachan.com/", Post = "http://konachan.com/post/index.json", Pool = "http://konachan.com/pool/index.xml", Notes = "http://konachan.com/note/index.json", FavoriteList = "http://konachan.com/favorite/list_users.json", MaxTags = 6};
 Danbooru.API.Sankaku = {Type = "JSON", Name = "Sankaku Channel", Main = "http://chan.sankakucomplex.com/", Post = "http://chan.sankakucomplex.com/post/index.json", Pool = "http://chan.sankakucomplex.com/pool/index.xml", Notes = "http://chan.sankakucomplex.com/note/index.json", FavoriteList = "http://chan.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
 Danbooru.API.IdolComplex = {Type = "JSON", Name = "Idol Complex", Main = "http://idol.sankakucomplex.com/", Post = "http://idol.sankakucomplex.com/post/index.json", Pool = "http://idol.sankakucomplex.com/pool/index.xml", Notes = "http://idol.sankakucomplex.com/note/index.json", FavoriteList = "http://idol.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
@@ -230,7 +230,7 @@ Application.LoadActionPlugin("AutoPlay\\Docs\\libessentials-5.1.dll");
 -- Check for error including.
 if (Application.GetLastError() ~= 0) then
 	Dialog.Message("Danbooru", "Failed to include 'libessentials-5.1.dll'.", 0, 16, 0);
-	Window.Close(Application.GetWndHandle(), 1);
+	os.exit();
 end
 
 -- Imagine Programming's Thumbnail library.
@@ -1196,8 +1196,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>920</DesignCodeLine>
-<DesignCodeCol>142</DesignCodeCol>
+<DesignCodeLine>69</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -1261,7 +1261,7 @@ end</Script>
 
 if (Resolution.Width &lt; 700) or (Resolution.Height &lt; 350) then
 	Dialog.Message("Danbooru", "Your screen resolution must be set to 700x300 or higher.", 0, 16, 0);
-	Window.Close(Application.GetWndHandle(), 1);
+	os.exit();
 end
 
 Border();</Script>
@@ -1392,10 +1392,10 @@ end</Script>
 <ProductVer2>0</ProductVer2>
 <ProductVer3>0</ProductVer3>
 <ProductVer4>0</ProductVer4>
-<Comments>Created with AutoPlay Media Studio</Comments>
-<Company>Original work by Shadiku Izayoi. &lt;www.shadiku.com&gt;</Company>
+<Comments>This is an open-source project, the source code is available at github.com/IllusionProgramming/danbooru-desktop</Comments>
+<Company>Illusion Programming</Company>
 <FileDescription>Danbooru desktop client</FileDescription>
-<LegalCopyright/>
+<LegalCopyright>All content found on imageboards belong to their respectful owners.</LegalCopyright>
 <LegalTrademarks/>
 <PrivateBuild/>
 <ProductName>Danbooru desktop client</ProductName>
@@ -1580,7 +1580,7 @@ if (not File.DoesExist(_SourceFolder.."\\settings.db")) then
 		Danbooru.WriteSettingsFile();
 	else
 		-- The user canceled, Terminate the program.
-		Window.Close(Application.GetWndHandle(), 1);
+		os.exit();
 	end
 end
 
@@ -1669,7 +1669,7 @@ local hWnd = ListBox.GetProperties("ListBox1").WindowHandle;
 -- Confirm the hWnd was found.
 if (not hWnd) or (hWnd == 0) then
 	Dialog.Message("Danbooru", "Failed to get object window handle, please restart application.", 0, 48, 0);
-	Window.Close(Application.GetWndHandle(), 1);
+	os.exit();
 end
 
 -- Create the ListIcon object using the object wrapper class ListIconEx.
@@ -2159,7 +2159,7 @@ end
 
 -- Ctrl+C
 if (e_Key == 67 and e_Modifiers.ctrl) then
-	Window.Close(Application.GetWndHandle(), 1);
+	os.exit();
 end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -2188,6 +2188,20 @@ end</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -5451,10 +5465,47 @@ if (t_tblChecked) then
 			end
 			
 			-- Decide on a destination filename.
-			local s_strDestination = Danbooru.LibraryPath.."\\"..t_tblDataTable.MD5..s_strExtension;
+			local s_strDestination;
+			
+			-- Tags table to string.
+			s_strDestination = Table.Concat(t_tblDataTable.Tags, " ", 1, -1):lower();
+			
+			-- Prefix site name.
+			s_strDestination = t_tblDataTable.API.Name.." - "..s_strDestination;
+			
+			-- Shorten string if it exceeds the NTFS filename limit.
+			if (s_strDestination:len() &gt; 255) then
+				-- Not sure if this includes the file extension.
+				s_strDestination = s_strDestination:sub(0, 150);
+			end
+			
+			-- Strip illegal characters.
+			s_strDestination = String.Replace(s_strDestination, '"', "", false);
+			s_strDestination = String.Replace(s_strDestination, "*", "", false);
+			s_strDestination = String.Replace(s_strDestination, ":", "", false);
+			s_strDestination = String.Replace(s_strDestination, "?", "", false);
+			s_strDestination = String.Replace(s_strDestination, "&lt;", "", false);
+			s_strDestination = String.Replace(s_strDestination, "&gt;", "", false);
+			s_strDestination = String.Replace(s_strDestination, "|", "", false);
+			s_strDestination = String.Replace(s_strDestination, "/", "", false);
+			s_strDestination = String.Replace(s_strDestination, "\\", "", false);
+			
+			-- Set the final names.
+			s_strTagDestination = Danbooru.LibraryPath.."\\"..s_strDestination..s_strExtension;
+			s_strMD5Destination = Danbooru.LibraryPath.."\\"..t_tblDataTable.MD5..s_strExtension;
+			
+			-- Decide on which to use.
+			if (tostring(Danbooru.Settings.UseTagsDestination) == "true") then
+				s_strDestination = s_strTagDestination;
+			else
+				s_strDestination = s_strMD5Destination;
+			end
+			
+			-- debug.
+			Dialog.Message("", s_strDestination.." ("..s_strDestination:len()..")");
 			
 			-- Confirm the file doesn't already exist.
-			if (File.DoesExist(s_strDestination)) then
+			if (File.DoesExist(s_strTagDestination)) or (File.DoesExist(s_strMD5Destination)) then
 				if (tostring(Danbooru.Settings.NoReplacePrompt) == "true") then
 					local Keep = (tostring(Danbooru.Settings.NoReplaceType) == "keep");
 					
@@ -5670,8 +5721,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>124</DesignCodeLine>
-<DesignCodeCol>49</DesignCodeCol>
+<DesignCodeLine>46</DesignCodeLine>
+<DesignCodeCol>50</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -7110,6 +7161,20 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body>25</Body>
@@ -7183,6 +7248,20 @@ end</Script>
 <Event>
 <Name>On Focus</Name>
 <Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -7278,6 +7357,20 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -7321,8 +7414,8 @@ end</Script>
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -7474,6 +7567,20 @@ ThumbList.SetThumbWidth("Thumbnails", 100);</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -10718,6 +10825,20 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -11488,8 +11609,8 @@ end</Script>
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -11524,7 +11645,7 @@ RadioButton.SetChecked("RadioButton6", true);</Script>
 
 if (not hWnd) or (hWnd == 0) then
 	Dialog.Message("Danbooru", "Failed to get object window handle, please restart application.", 0, 48, 0);
-	Window.Close(Application.GetWndHandle(), 1);
+	os.exit();
 end
 
 Danbooru.LibraryListIcon = ListIconEx.CreateObject("FolderView1", "Tags", 500, {GridLines = false});
@@ -11705,6 +11826,20 @@ Page.ClickObject("xButton4");</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -12922,8 +13057,8 @@ Paragraph.SetText("Paragraph2", "/ - "..Table.Count(Danbooru.LibraryListIcon.Tag
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -13061,6 +13196,20 @@ Window.SetText(Application.GetWndHandle(), Danbooru.VersionString.." - Pool List
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -13799,6 +13948,20 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -14060,6 +14223,20 @@ end</Script>
 <Event>
 <Name>On Focus</Name>
 <Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -15008,6 +15185,20 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 </BookMarks>
 </Event>
 <Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
 <Name>On Size</Name>
 <Args>number e_WindowWidth, number e_WindowHeight, number e_DialogWidth, number e_DialogHeight, number e_Type</Args>
 <Script/>
@@ -15097,8 +15288,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -15206,6 +15397,20 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -15492,14 +15697,14 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>File.OpenURL("http://shadiku.com/updates/");</Script>
+<Script>File.OpenURL("http://shadiku.com/projects/danbooru/");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>44</DesignCodeCol>
+<DesignCodeCol>51</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -16321,7 +16526,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Top>179</Top>
 <Bottom>200</Bottom>
 <Left>125</Left>
-<Right>266</Right>
+<Right>286</Right>
 </OriginalRect>
 </Text>
 </Object>
@@ -16927,6 +17132,20 @@ end</Script>
 </BookMarks>
 </Event>
 <Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
 <Name>On Size</Name>
 <Args>number e_WindowWidth, number e_WindowHeight, number e_DialogWidth, number e_DialogHeight, number e_Type</Args>
 <Script/>
@@ -17125,6 +17344,20 @@ end</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -17358,6 +17591,7 @@ end
 
 Danbooru.SetSettingsValue("ClearListOnNewSearch", CheckBox.GetChecked("CheckBox4"));
 Danbooru.SetSettingsValue("ShowSplashScreen", CheckBox.GetChecked("CheckBox2"));
+Danbooru.SetSettingsValue("UseTagsDestination", CheckBox.GetChecked("CheckBox11"));
 
 Danbooru.SetSettingsValue("EnableNewColorRequest", RadioButton.GetChecked("RadioButton4"));
 Danbooru.SetSettingsValue("EnableNewStatusColor", RadioButton.GetChecked("RadioButton5"));
@@ -17372,8 +17606,8 @@ DialogEx.Close(0);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>28</DesignCodeLine>
-<DesignCodeCol>76</DesignCodeCol>
+<DesignCodeLine>29</DesignCodeLine>
+<DesignCodeCol>45</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -18486,6 +18720,20 @@ DialogEx.Close(0);</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -18657,8 +18905,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>356</Top>
-<Bottom>370</Bottom>
+<Top>333</Top>
+<Bottom>347</Bottom>
 <Left>32</Left>
 <Right>354</Right>
 </Coordinates>
@@ -18766,8 +19014,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>333</Top>
-<Bottom>347</Bottom>
+<Top>310</Top>
+<Bottom>324</Bottom>
 <Left>32</Left>
 <Right>354</Right>
 </Coordinates>
@@ -19100,6 +19348,20 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -19145,8 +19407,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>282</Top>
-<Bottom>297</Bottom>
+<Top>259</Top>
+<Bottom>274</Bottom>
 <Left>32</Left>
 <Right>332</Right>
 </Coordinates>
@@ -19254,8 +19516,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>303</Top>
-<Bottom>318</Bottom>
+<Top>280</Top>
+<Bottom>295</Bottom>
 <Left>32</Left>
 <Right>332</Right>
 </Coordinates>
@@ -19363,8 +19625,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>379</Top>
-<Bottom>393</Bottom>
+<Top>356</Top>
+<Bottom>370</Bottom>
 <Left>32</Left>
 <Right>354</Right>
 </Coordinates>
@@ -19457,6 +19719,128 @@ end</Script>
 </FontData>
 </Font>
 </Object>
+<Object>
+<Type>15</Type>
+<Name>CheckBox11</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>15</AutoResize>
+<Coordinates>
+<Top>378</Top>
+<Bottom>394</Bottom>
+<Left>32</Left>
+<Right>382</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script>if (CheckBox.GetChecked(this)) then
+	Dialog.Message("Danbooru", "This feature can cause downloads to fail due to the filename limit in NTFS.\r\n\r\nIf you have problems with downloads, please turn this option off before reporting.", 0, 48, 0);
+end</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions>
+<Action>
+<Type>0</Type>
+<Name>None</Name>
+<Exit>0</Exit>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+</Action>
+</Actions>
+<Options>
+<Text>Save images with their tags for filenames instead of MD5 hash.</Text>
+<NormalColor format="hex">000000</NormalColor>
+<HighlightColor format="hex">000000</HighlightColor>
+<MouseDownColor format="hex">000000</MouseDownColor>
+<Disabled format="hex">c0c0c0</Disabled>
+<Alignment>0</Alignment>
+<ButtonAlign>0</ButtonAlign>
+<RTLReadingOrder>0</RTLReadingOrder>
+<Checked>0</Checked>
+<MouseOverSoundMode>0</MouseOverSoundMode>
+<MouseOverSound/>
+<MouseClickSoundMode>0</MouseClickSoundMode>
+<MouseClickSound/>
+</Options>
+<Font>
+<FontData>
+<FontName>Tahoma</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-11</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+</Font>
+</Object>
 <HGuidelines/>
 <VGuidelines/>
 </Page>
@@ -19472,8 +19856,8 @@ end</Script>
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -19630,6 +20014,20 @@ DialogEx.Close(0);</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -20671,8 +21069,8 @@ DialogEx.Close(0);</Script>
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -20825,6 +21223,20 @@ DialogEx.Close(0);</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -21866,8 +22278,8 @@ DialogEx.Close(0);</Script>
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -21985,6 +22397,20 @@ RadioButton.SetChecked("RadioButton3", DataTable.Rating.Explicit);</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -22976,6 +23402,20 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -23510,6 +23950,20 @@ DialogEx.Close(0);</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
 <Actions/>
 <Text>
 <Body/>
@@ -23885,8 +24339,8 @@ RadioButton.SetChecked("RadioButton3", DataTable.Rating.Explicit);</Script>
 <Type>0</Type>
 <ImageStyle>0</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16777215</BottomColor>
-<UseCustomBackgroundSettings>0</UseCustomBackgroundSettings>
+<BottomColor>16316664</BottomColor>
+<UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
@@ -24014,6 +24468,20 @@ end</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -24491,7 +24959,7 @@ DialogEx.Close(0);</Script>
 <VGuidelines/>
 </Page>
 </PageDialog>
-<PageDialog width="650" height="530" dialog_title="Danbooru - Settings" dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="480" min_height="300" fit_custom_mask_to_window="1" custom_mask="">
+<PageDialog width="650" height="550" dialog_title="Danbooru - Settings" dialog_style="0" movable="1" use_custom_icon="0" custom_icon="" always_on_top="0" resizable="0" min_width="480" min_height="300" fit_custom_mask_to_window="1" custom_mask="">
 <Page>
 <Name>Settings</Name>
 <InheritObs/>
@@ -24513,7 +24981,7 @@ DialogEx.Close(0);</Script>
 <Event>
 <Name>On Preload</Name>
 <Args/>
-<Script>-- CheckBox1, CheckBox2, CheckBox3, CheckBox4, CheckBox5, CheckBox6, CheckBox7, CheckBox8, CheckBox9, CheckBox10.
+<Script>-- CheckBox1, CheckBox2, CheckBox3, CheckBox4, CheckBox5, CheckBox6, CheckBox7, CheckBox8, CheckBox9, CheckBox10, CheckBox11.
 CheckBox.SetChecked("CheckBox1", (tostring(Danbooru.Settings.RememberSourceSelection) == "true"));
 CheckBox.SetChecked("CheckBox2", (tostring(Danbooru.Settings.UseGelbooruWorkaround) == "true"));
 CheckBox.SetChecked("CheckBox3", (tostring(Danbooru.Settings.ShowSplashScreen) == "true"));
@@ -24524,6 +24992,7 @@ CheckBox.SetChecked("CheckBox7", (tostring(Danbooru.Settings.NeverGetNotes) == "
 CheckBox.SetChecked("CheckBox8", (tostring(Danbooru.Settings.RememberTags) == "true"));
 CheckBox.SetChecked("CheckBox9", (tostring(Danbooru.Settings.RememberPageAndLimit) == "true"));
 CheckBox.SetChecked("CheckBox10", (tostring(Danbooru.Settings.UseURLHandler) == "true"));
+CheckBox.SetChecked("CheckBox11", (tostring(Danbooru.Settings.UseTagsDestination) == "true"));
 
 -- ComboBox1.
 local IsOverwrite = (tostring(Danbooru.Settings.NoReplaceType) == "overwrite");
@@ -24571,8 +25040,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>10</DesignCodeLine>
-<DesignCodeCol>31</DesignCodeCol>
+<DesignCodeLine>11</DesignCodeLine>
+<DesignCodeCol>94</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -24663,6 +25132,20 @@ end</Script>
 <Event>
 <Name>On Mouse Move</Name>
 <Args>number e_X, number e_Y</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Mouse Wheel</Name>
+<Args>table e_Flags, number e_Delta, number e_X, number e_Y</Args>
 <Script/>
 <TreeStates>
 <TreeState>0</TreeState>
@@ -24779,8 +25262,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>487</Top>
-<Bottom>531</Bottom>
+<Top>507</Top>
+<Bottom>551</Bottom>
 <Left>-1</Left>
 <Right>651</Right>
 </Coordinates>
@@ -24855,8 +25338,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>499</Top>
-<Bottom>522</Bottom>
+<Top>519</Top>
+<Bottom>542</Bottom>
 <Left>484</Left>
 <Right>559</Right>
 </Coordinates>
@@ -24895,6 +25378,7 @@ Danbooru.SetSettingsValue("NeverGetNotes", CheckBox.GetChecked("CheckBox7"));
 Danbooru.SetSettingsValue("RememberTags", CheckBox.GetChecked("CheckBox8"));
 Danbooru.SetSettingsValue("RememberPageAndLimit", CheckBox.GetChecked("CheckBox9"));
 Danbooru.SetSettingsValue("UseURLHandler", CheckBox.GetChecked("CheckBox10"));
+Danbooru.SetSettingsValue("UseTagsDestination", CheckBox.GetChecked("CheckBox11"));
 
 Danbooru.SetSettingsValue("EnableNewColorRequest", RadioButton.GetChecked("RadioButton4"));
 Danbooru.SetSettingsValue("EnableNewStatusColor", RadioButton.GetChecked("RadioButton5"));
@@ -24915,8 +25399,8 @@ DialogEx.Close(0);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>27</DesignCodeLine>
-<DesignCodeCol>27</DesignCodeCol>
+<DesignCodeLine>28</DesignCodeLine>
+<DesignCodeCol>45</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -25019,8 +25503,8 @@ DialogEx.Close(0);</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>499</Top>
-<Bottom>522</Bottom>
+<Top>519</Top>
+<Bottom>542</Bottom>
 <Left>564</Left>
 <Right>639</Right>
 </Coordinates>
@@ -26468,8 +26952,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>436</Top>
-<Bottom>455</Bottom>
+<Top>462</Top>
+<Bottom>481</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </Coordinates>
@@ -26558,8 +27042,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>436</Top>
-<Bottom>455</Bottom>
+<Top>462</Top>
+<Bottom>481</Bottom>
 <Left>32</Left>
 <Right>115</Right>
 </OriginalRect>
@@ -26580,8 +27064,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>433</Top>
-<Bottom>455</Bottom>
+<Top>459</Top>
+<Bottom>481</Bottom>
 <Left>124</Left>
 <Right>509</Right>
 </Coordinates>
@@ -26656,8 +27140,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>437</Top>
-<Bottom>452</Bottom>
+<Top>463</Top>
+<Bottom>478</Bottom>
 <Left>127</Left>
 <Right>506</Right>
 </Coordinates>
@@ -26690,6 +27174,20 @@ end</Script>
 </TreeStates>
 <DesignCodeLine>3158064</DesignCodeLine>
 <DesignCodeCol>2573</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Char</Name>
+<Args>number e_Char, table e_Modifiers</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -27057,8 +27555,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>385</Top>
-<Bottom>400</Bottom>
+<Top>411</Top>
+<Bottom>426</Bottom>
 <Left>126</Left>
 <Right>426</Right>
 </Coordinates>
@@ -27166,8 +27664,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>406</Top>
-<Bottom>421</Bottom>
+<Top>432</Top>
+<Bottom>447</Bottom>
 <Left>126</Left>
 <Right>426</Right>
 </Coordinates>
@@ -27275,8 +27773,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>385</Top>
-<Bottom>404</Bottom>
+<Top>411</Top>
+<Bottom>430</Bottom>
 <Left>32</Left>
 <Right>94</Right>
 </Coordinates>
@@ -27365,8 +27863,8 @@ end</Script>
 <MouseClickSndMode>0</MouseClickSndMode>
 <MouseClickSound/>
 <OriginalRect>
-<Top>385</Top>
-<Bottom>404</Bottom>
+<Top>411</Top>
+<Bottom>430</Bottom>
 <Left>32</Left>
 <Right>94</Right>
 </OriginalRect>
@@ -27919,6 +28417,117 @@ end</Script>
 </FontData>
 </Font>
 </Object>
+<Object>
+<Type>15</Type>
+<Name>CheckBox11</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>15</AutoResize>
+<Coordinates>
+<Top>383</Top>
+<Bottom>399</Bottom>
+<Left>125</Left>
+<Right>475</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script>if (CheckBox.GetChecked(this)) then
+	Dialog.Message("Danbooru", "This feature can cause downloads to fail due to the filename limit in NTFS.\r\n\r\nIf you have problems with downloads, please turn this option off before reporting.", 0, 48, 0);
+end</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<Options>
+<Text>Save images with their tags for filenames instead of MD5 hash.</Text>
+<NormalColor format="hex">000000</NormalColor>
+<HighlightColor format="hex">000000</HighlightColor>
+<MouseDownColor format="hex">000000</MouseDownColor>
+<Disabled format="hex">c0c0c0</Disabled>
+<Alignment>0</Alignment>
+<ButtonAlign>0</ButtonAlign>
+<RTLReadingOrder>0</RTLReadingOrder>
+<Checked>0</Checked>
+<MouseOverSoundMode>0</MouseOverSoundMode>
+<MouseOverSound/>
+<MouseClickSoundMode>0</MouseClickSoundMode>
+<MouseClickSound/>
+</Options>
+<Font>
+<FontData>
+<FontName>Tahoma</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-11</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+</Font>
+</Object>
 <HGuidelines/>
 <VGuidelines/>
 </Page>
@@ -27955,7 +28564,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <TimeStampFilesCDRW>0</TimeStampFilesCDRW>
 <TimeStampFilesISO>0</TimeStampFilesISO>
 <ISOImageFile/>
-<SelfExtractingZIPfile>C:\Users\Shadiku\Documents\Git projects\Danbooru (binary)\danbooru.exe</SelfExtractingZIPfile>
+<SelfExtractingZIPfile>C:\Documents and Settings\Shadiku Izayoi\My Documents\Git projects\danbooru-binary\danbooru.exe</SelfExtractingZIPfile>
 <ZIPMessage>Loading</ZIPMessage>
 <ZIPShowProgress>0</ZIPShowProgress>
 <CDVolumeIdentifier>NEWDISC</CDVolumeIdentifier>
@@ -27964,7 +28573,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <BuildType>2</BuildType>
 <DriveLetter/>
 <UsePassword>0</UsePassword>
-<OpenFolder>1</OpenFolder>
+<OpenFolder>0</OpenFolder>
 <ObscureFilenames>0</ObscureFilenames>
 <ObscureDataFolder>AutoPlay</ObscureDataFolder>
 </ProgramPrefs>
