@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?><DocumentData>
-<ProductVersion>8.0.4.0</ProductVersion>
+<ProductVersion>8.1.0.0</ProductVersion>
 <ProductID>{ABF9EF9E-ECF6-4019-8A3E-908A6CFF4D1A}</ProductID>
 <IRProductName>AutoPlay Media Studio 8</IRProductName>
 <ProductType>Commercial</ProductType>
@@ -8,11 +8,11 @@
 <Author>Shadiku "Akira" Izayoi</Author>
 <Company>Illusion Programming</Company>
 <Copyright>Copyright © 2011, Illusion Programming.</Copyright>
-<URL>http://www.shadiku.com/</URL>
-<Email>shadiku@gensokyo.co.uk</Email>
+<URL>http://github.com/aixxe/Danbooru</URL>
+<Email>aixxe@skyenet.org</Email>
 <Comments/>
 <CreatedVersion>7.5.1006.0 (Professional Edition Commercial)</CreatedVersion>
-<LastSavedVersion>8.0.4.0 (Professional Edition Commercial)</LastSavedVersion>
+<LastSavedVersion>8.1.0.0 (Professional Edition Commercial)</LastSavedVersion>
 </DocInfo>
 <ProjectInfo ToolTipStyle="2">
 <Office2007Theme Theme="3"/>
@@ -67,9 +67,9 @@
 
 	Danbooru desktop client (danbooru-desktop)
 	
-	Copyright (C) 2011 Illusion Programming.
+	Copyright (C) 2011 - 2016 Illusion Programming.
 	
-	Contributers:	Shadiku Izayoi &lt;blackhawk.delta@gmail.com&gt;
+	Contributers:	Shadiku Izayoi &lt;izayoi@shadiku.com&gt;
 					Amy Prismriver &lt;amy.prismriver@gmail.com&gt;
 					Edward Parkes &lt;wolvenhound.edwardparkes@googlemail.com&gt;
 					Bas Groothedde &lt;bas@imagine-programming.com&gt;
@@ -119,7 +119,7 @@ Danbooru.ThumbnailHeight = 200;
 
 -- Icons for imageboards.
 Danbooru.Icons.Danbooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\danbooru.ico");
-Danbooru.Icons.OrenoImouto = ListIcon.LoadImage(6, "AutoPlay\\Icons\\moe.ico");
+Danbooru.Icons.Yandere = ListIcon.LoadImage(6, "AutoPlay\\Icons\\yandere.ico");
 Danbooru.Icons.Konachan = ListIcon.LoadImage(6, "AutoPlay\\Icons\\konachan.ico");
 Danbooru.Icons.Sankaku = ListIcon.LoadImage(6, "AutoPlay\\Icons\\sankaku.ico");
 Danbooru.Icons.IdolComplex = Danbooru.Icons.Sankaku;
@@ -132,7 +132,7 @@ Danbooru.Icons.Blacklisted = ListIcon.LoadImage(6, "AutoPlay\\Images\\exclamatio
 
 -- Danbooru imageboard sources, these only need be defined here and the icon defined above. (r18)
 Danbooru.API.Danbooru = {Type = "JSON", Name = "Danbooru", Main = "http://danbooru.donmai.us/", Post = "http://danbooru.donmai.us/post/index.json", Pool = "http://danbooru.donmai.us/pool/index.xml", Notes = "http://danbooru.donmai.us/note/index.json", FavoriteList = "http://danbooru.donmai.us/favorite/list_users.json", MaxTags = 2};
-Danbooru.API.OrenoImouto = {Type = "JSON", Name = "Oreno Imouto", Main = "http://oreno.imouto.org/", Post = "http://oreno.imouto.org/post/index.json", Pool = "http://oreno.imouto.org/pool/index.xml", Notes = "http://oreno.imouto.org/note/index.json", FavoriteList = "http://oreno.imouto.org/favorite/list_users.json", MaxTags = 2};
+Danbooru.API.Yandere = {Type = "JSON", Name = "Yande.re", Main = "http://yande.re/", Post = "http://yande.re/post/index.json", Pool = "http://yande.re/pool/index.xml", Notes = "http://yande.re/note/index.json", FavoriteList = "http://yande.re/favorite/list_users.json", MaxTags = 2};
 Danbooru.API.Konachan = {Type = "JSON", Name = "Konachan", Main = "http://konachan.com/", Post = "http://konachan.com/post/index.json", Pool = "http://konachan.com/pool/index.xml", Notes = "http://konachan.com/note/index.json", FavoriteList = "http://konachan.com/favorite/list_users.json", MaxTags = 6};
 Danbooru.API.Sankaku = {Type = "JSON", Name = "Sankaku Channel", Main = "http://chan.sankakucomplex.com/", Post = "http://chan.sankakucomplex.com/post/index.json", Pool = "http://chan.sankakucomplex.com/pool/index.xml", Notes = "http://chan.sankakucomplex.com/note/index.json", FavoriteList = "http://chan.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
 Danbooru.API.IdolComplex = {Type = "JSON", Name = "Idol Complex", Main = "http://idol.sankakucomplex.com/", Post = "http://idol.sankakucomplex.com/post/index.json", Pool = "http://idol.sankakucomplex.com/pool/index.xml", Notes = "http://idol.sankakucomplex.com/note/index.json", FavoriteList = "http://idol.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
@@ -988,7 +988,7 @@ function Danbooru.QueryAndInsert(API, Icon, Query, MaxTags)
 					if (Application.GetLastError() ~= 0) then
 						Dialog.Message("Error", "Well this is embarassing.. Seems we couldn't even copy the text to the clipboard!\r\n\r\nDamn you Windows!", 0, 48, 0);
 					else
-						Dialog.Message("Danbooru", "Copied data to clipboard.\r\n\r\nPlease visit: http://shadiku.com/contact to report this bug with your clipboard information.", 0, 64, 0);
+						Dialog.Message("Danbooru", "Copied data to clipboard.\r\n\r\nPlease visit: http://github.com/aixxe/Danbooru to report this bug with your clipboard information.", 0, 64, 0);
 					end
 				end
 			else
@@ -1196,8 +1196,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>69</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>4</DesignCodeLine>
+<DesignCodeCol>26</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -15694,7 +15694,7 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>File.OpenURL("http://shadiku.com/projects/danbooru/");</Script>
+<Script>File.OpenURL("http://github.com/aixxe/Danbooru");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
