@@ -497,6 +497,19 @@ function Danbooru.Post(Tags, Limit, Page, API)
 							break;
 						end
 						
+						-- fix relative paths
+						if (V.file_url and V.file_url:sub(0, 1) == "/") then
+							V.file_url = API.Main..V.file_url:sub(2, -1);
+						end
+						
+						if (V.preview_url and V.preview_url:sub(0, 1) == "/") then
+							V.preview_url = API.Main..V.preview_url:sub(2, -1);
+						end
+						
+						if (V.sample_url and V.sample_url:sub(0, 1) == "/") then
+							V.sample_url = API.Main..V.sample_url:sub(2, -1);
+						end
+						
 						-- we need this. (2.60)
 						ReturnTable[Index].API = API;
 						
@@ -593,7 +606,7 @@ function Danbooru.Post(Tags, Limit, Page, API)
 							ReturnTable[Index].Preview.Width, ReturnTable[Index].Preview.Height, ReturnTable[Index].Preview.URL = String.ToNumber(V.preview_width), String.ToNumber(V.preview_height), V.preview_url;
 						else
 							ReturnTable[Index].Preview = {};
-							ReturnTable[Index].Preview.Width, ReturnTable[Index].Preview.Height, ReturnTable[Index].Preview.URL = 0, 0, "http://konachan.com/images/404.jpg";
+							ReturnTable[Index].Preview.Width, ReturnTable[Index].Preview.Height, ReturnTable[Index].Preview.URL = 0, 0, V.preview_url or "http://konachan.com/images/404.jpg";
 						end
 						
 						if (V.width and V.height) then
@@ -607,7 +620,7 @@ function Danbooru.Post(Tags, Limit, Page, API)
 							ReturnTable[Index].Sample.Width, ReturnTable[Index].Sample.Height, ReturnTable[Index].Sample.URL = String.ToNumber(V.sample_width), String.ToNumber(V.sample_height), V.sample_url;
 						else
 							ReturnTable[Index].Sample = {};
-							ReturnTable[Index].Sample.Width, ReturnTable[Index].Sample.Height, ReturnTable[Index].Sample.URL = 0, 0, "http://konachan.com/images/404.jpg";
+							ReturnTable[Index].Sample.Width, ReturnTable[Index].Sample.Height, ReturnTable[Index].Sample.URL = 0, 0, V.sample_url or "http://konachan.com/images/404.jpg";
 						end
 						
 						-- TODO: Y.created_at, Y.updated_at.
@@ -1188,8 +1201,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>67</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>722</DesignCodeLine>
+<DesignCodeCol>24</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -2057,8 +2070,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>386</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>92</DesignCodeLine>
+<DesignCodeCol>1</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -15015,7 +15028,11 @@ end</Script>
 <Args/>
 <Script>local Data = DialogValues.GetValue("Preview", "Data");
 
-if (Data) then	
+if (Data) then
+	if (Data.Sample.URL == "http://konachan.com/images/404.jpg") then
+		Data.Sample.URL = Data.URL;
+	end
+
 	if (Data.URL:sub(Data.URL:len() - 3, -1) == ".swf") then
 		Window.SetText(DialogEx.GetWndHandle(), "Viewing flash..");
 		local HTMLCode = [[&lt;html&gt;
@@ -15038,13 +15055,6 @@ if (Data) then
 	&lt;/html&gt;]];
 		Web.LoadHTML("Web1", HTMLCode);
 	else
-		local Width, Height = Data.Preview.Width, Data.Preview.Height;
-		
-		repeat
-			Width = Width * 1.1;
-			Height = Height * 1.1;
-		until (Width &gt;= 800 and Height &gt;= 600)
-		
 		local HTMLCode = [[&lt;html&gt;
 		&lt;head&gt;
 			&lt;style type="text/css"&gt;
@@ -15057,13 +15067,13 @@ if (Data) then
 			var flag = true;
 			function resize() {
 				if(flag) {
-					document.getElementById("img1").style.width = "]]..Width..[[px";
-					document.getElementById("img1").style.height = "]]..Height..[[px";
+					document.getElementById("img1").style.width = "]]..Data.Width..[[px";
+					document.getElementById("img1").style.height = "]]..Data.Height..[[px";
 				} else {
 					document.getElementById("img1").style.width = "100%";
 					document.getElementById("img1").style.height = "100%";
 				}
-				(flag)?flag=false:flag=true;
+				flag = !flag;
 			} 
 			//--&gt;
 			&lt;/script&gt;
@@ -15084,8 +15094,8 @@ Window.SetText(DialogEx.GetWndHandle(), "Previewing image.. (click to resize / a
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>65</DesignCodeLine>
-<DesignCodeCol>109</DesignCodeCol>
+<DesignCodeLine>47</DesignCodeLine>
+<DesignCodeCol>17</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
