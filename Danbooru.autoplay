@@ -67,7 +67,7 @@
 
 	Danbooru desktop client (danbooru-desktop)
 	
-	Copyright (C) 2011 - 2016 Illusion Programming.
+	Copyright (C) 2010 - 2016 Illusion Programming.
 	
 	Contributers:	Shadiku Izayoi &lt;izayoi@shadiku.com&gt;
 					Amy Prismriver &lt;amy.prismriver@gmail.com&gt;
@@ -121,11 +121,7 @@ Danbooru.ThumbnailHeight = 200;
 Danbooru.Icons.Danbooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\danbooru.ico");
 Danbooru.Icons.Yandere = ListIcon.LoadImage(6, "AutoPlay\\Icons\\yandere.ico");
 Danbooru.Icons.Konachan = ListIcon.LoadImage(6, "AutoPlay\\Icons\\konachan.ico");
-Danbooru.Icons.Sankaku = ListIcon.LoadImage(6, "AutoPlay\\Icons\\sankaku.ico");
-Danbooru.Icons.IdolComplex = Danbooru.Icons.Sankaku;
-Danbooru.Icons.Nekobooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\nekobooru.ico");
 Danbooru.Icons.Gelbooru = ListIcon.LoadImage(6, "AutoPlay\\Icons\\gelbooru.ico");
-Danbooru.Icons.Genso = ListIcon.LoadImage(6, "AutoPlay\\Icons\\genso.ico");
 
 -- Icon for blacklisted posts.
 Danbooru.Icons.Blacklisted = ListIcon.LoadImage(6, "AutoPlay\\Images\\exclamation.png");
@@ -134,11 +130,7 @@ Danbooru.Icons.Blacklisted = ListIcon.LoadImage(6, "AutoPlay\\Images\\exclamatio
 Danbooru.API.Danbooru = {Type = "JSON", Name = "Danbooru", Main = "http://danbooru.donmai.us/", Post = "http://danbooru.donmai.us/post/index.json", Pool = "http://danbooru.donmai.us/pool/index.xml", Notes = "http://danbooru.donmai.us/note/index.json", FavoriteList = "http://danbooru.donmai.us/favorite/list_users.json", MaxTags = 2};
 Danbooru.API.Yandere = {Type = "JSON", Name = "Yande.re", Main = "http://yande.re/", Post = "http://yande.re/post/index.json", Pool = "http://yande.re/pool/index.xml", Notes = "http://yande.re/note/index.json", FavoriteList = "http://yande.re/favorite/list_users.json", MaxTags = 2};
 Danbooru.API.Konachan = {Type = "JSON", Name = "Konachan", Main = "http://konachan.com/", Post = "http://konachan.com/post/index.json", Pool = "http://konachan.com/pool/index.xml", Notes = "http://konachan.com/note/index.json", FavoriteList = "http://konachan.com/favorite/list_users.json", MaxTags = 6};
-Danbooru.API.Sankaku = {Type = "JSON", Name = "Sankaku Channel", Main = "http://chan.sankakucomplex.com/", Post = "http://chan.sankakucomplex.com/post/index.json", Pool = "http://chan.sankakucomplex.com/pool/index.xml", Notes = "http://chan.sankakucomplex.com/note/index.json", FavoriteList = "http://chan.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
-Danbooru.API.IdolComplex = {Type = "JSON", Name = "Idol Complex", Main = "http://idol.sankakucomplex.com/", Post = "http://idol.sankakucomplex.com/post/index.json", Pool = "http://idol.sankakucomplex.com/pool/index.xml", Notes = "http://idol.sankakucomplex.com/note/index.json", FavoriteList = "http://idol.sankakucomplex.com/favorite/list_users.json", MaxTags = 5};
-Danbooru.API.Nekobooru = {Type = "JSON", Name = "Nekobooru", Main = "http://nekobooru.net", Post = "http://nekobooru.net/post/index.json", Pool = "http://nekobooru.net/pool/index.xml", Notes = "http://nekobooru.net/note/index.json", FavoriteList = "http://nekobooru.net/favorite/list_users.json", MaxTags = 2};
 Danbooru.API.Gelbooru = {Type = "XML", Name = "Gelbooru", Main = "http://gelbooru.com/", Post = "http://gelbooru.com/index.php"}; -- No idea here since all other imageboards gave HTTP 500 error when exceeding the maximum tags.. ~Amy
-Danbooru.API.Genso = {Type = "JSON", Name = "Akyu Genso", Main = "http://genso.ws", Post = "http://genso.ws/post/index.json", Pool = "http://genso.ws/pool/index.xml", Notes = "http://genso.ws/note/index.json", FavoriteList = "http://genso.ws/favorite/list_users.json", MaxTags = 2};
 
 -- Populate sources table.
 Danbooru.Sources = {};
@@ -1196,8 +1188,8 @@ function Danbooru.SortByTags()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>4</DesignCodeLine>
-<DesignCodeCol>26</DesignCodeCol>
+<DesignCodeLine>67</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
